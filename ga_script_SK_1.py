@@ -7,6 +7,9 @@ from cifo.custom_problem.knapsack_problem import (
     KnapsackProblem, knapsack_decision_variables_example, knapsack_constraints_example, 
     knapsack_bitflip_get_neighbors
 )
+from cifo.custom_problem.travel_salesman_problem import (
+    TravelSalesmanProblem, tsp_bitflip_get_neighbors
+)
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
     initialize_randomly,
@@ -92,7 +95,7 @@ def plot_performance_chart( df ):
 # Problem
 #--------------------------------------------------------------------------------------------------
 # Decision Variables
-"""
+
 dv = {
     "Values"    : [360, 83, 59, 130, 431, 67, 230, 52, 93, 125, 670, 892, 600, 38, 48, 147, 
     78, 256, 63, 17, 120, 164, 432, 35, 92, 110, 22, 42, 50, 323, 514, 28, 87, 73, 78, 15, 
@@ -102,7 +105,6 @@ dv = {
     42, 47, 52, 32, 26, 48, 55, 6, 29, 84, 2, 4, 18, 56, 7, 29, 93, 44, 71,
     3, 86, 66, 31, 65, 0, 79, 20, 65, 52, 13]
 }
-"""
 data = [
         [0, 2451, 713, 1018, 1631, 1374, 2408, 213, 2571, 875, 1420, 2145, 1972],
         [2451, 0, 1745, 1524, 831, 1240, 959, 2596, 403, 1589, 1374, 357, 579],
@@ -122,8 +124,13 @@ data = [
 
 # Problem Instance
 knapsack_problem_instance = KnapsackProblem( 
-    decision_variables = data,
+    decision_variables = dv,
     constraints = { "Max-Weight" : 400 })
+
+
+travel_salesman_instance = TravelSalesmanProblem(
+    decision_variables = data,
+    constraints = None) 
 
 
 # Configuration

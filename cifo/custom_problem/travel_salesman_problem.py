@@ -25,7 +25,7 @@ class TravelSalesmanProblem( ProblemTemplate ):
 
     # Constructor
     #----------------------------------------------------------------------------------------------
-    def __init__(self, decision_variables, constraints , encoding_rule = knapsack_encoding_rule):
+    def __init__(self, decision_variables, constraints , encoding_rule = tsp_encoding_rule):
         """
         """
         # optimize the access to the decision variables
@@ -39,12 +39,12 @@ class TravelSalesmanProblem( ProblemTemplate ):
         )
 
         # 1. Define the Name of the Problem
-        self._name = "Problem Name"
+        self._name = "Travelling Salesman Problem"
         
         # 2. Define the Problem Objective
         self._objective = ProblemObjective.Minimization
 
-    # Build Solution for Knapsack Problem
+    # Build Solution for Travelling Salesman Problem
     #----------------------------------------------------------------------------------------------
     def build_solution(self):
         """
@@ -71,5 +71,5 @@ class TravelSalesmanProblem( ProblemTemplate ):
 # OPTIONAL - it onlu+y is needed if you will implement Local Search Methods
 #            (Hill Climbing and Simulated Annealing)
 # -------------------------------------------------------------------------------------------------
-def pip_bitflip_get_neighbors( solution, problem, neighborhood_size = 0 ):
+def tsp_bitflip_get_neighbors( solution, problem, neighborhood_size = 0 ):
     pass
