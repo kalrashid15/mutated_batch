@@ -72,7 +72,7 @@ def initialize_using_sa( problem, population_size ):
 # -------------------------------------------------------------------------------------------------
 # class RouletteWheelSelection
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Roulette Wheel for Minimization
+# TODO: implement Roulette Wheel for Minimization: Done by Rash and Hugo @21/12/19
 class RouletteWheelSelection:
     """
     Main idea: better individuals get higher chance
@@ -96,12 +96,16 @@ class RouletteWheelSelection:
         return population.get( index1 ), population.get( index2 )
 
 
-    def _select_index(self, population ):
+
+        def _select_index(self, population, objective):
+        # for Min: calculate fitness 1/50, 1/30, 1/20 new values. Calculate values (sum of new values). Divide new values by sum of new values
 
         # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
         total_fitness = 0
+        solution_fitness_min = 0
         for solution in population.solutions:
             total_fitness += solution.fitness
+            solution_fitness_min += 1/solution.fitness
 
         # spin the wheel
         wheel_position = uniform( 0, 1 )
@@ -110,12 +114,18 @@ class RouletteWheelSelection:
         stop_position = 0
         index = 0
         for solution in population.solutions :
-            stop_position += (solution.fitness / total_fitness)
+            if objective == ProblemObjective.Maximization:
+                stop_position += (solution.fitness / total_fitness)
+                #stop_position += solution.fitness
+            elif objective == ProblemObjective.Minimization:
+                stop_position += 1 / solution.fitness / solution_fitness_min
+
+            #stop_position +=(1/solution.fitness)
             if stop_position > wheel_position :
                 break
             index += 1    
 
-        return index    
+        return index
         
 # -------------------------------------------------------------------------------------------------
 # class RankSelection
