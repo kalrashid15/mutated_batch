@@ -30,6 +30,8 @@ class TravelSalesmanProblem( ProblemTemplate ):
         """
         # optimize the access to the decision variables
         # ...
+        self._values = []
+        if
 
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
         super().__init__(
@@ -68,8 +70,9 @@ class TravelSalesmanProblem( ProblemTemplate ):
 
 
 # -------------------------------------------------------------------------------------------------
-# OPTIONAL - it onlu+y is needed if you will implement Local Search Methods
+# OPTIONAL - it only is needed if you will implement Local Search Methods
 #            (Hill Climbing and Simulated Annealing)
 # -------------------------------------------------------------------------------------------------
 def tsp_bitflip_get_neighbors( solution, problem, neighborhood_size = 0 ):
+    #the nearest city that has not yet been visited
     pass

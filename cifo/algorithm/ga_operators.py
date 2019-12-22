@@ -61,7 +61,7 @@ def initialize_using_hc( problem, population_size ):
 # -------------------------------------------------------------------------------------------------
 # Initialization using Simulated Annealing
 # -------------------------------------------------------------------------------------------------
-#TODO: OPTIONAL, implement a initialization based on Hill Climbing
+#TODO: OPTIONAL, implement a initialization based on Simulated Annealing
 # Remark: remember, you will need a neighborhood functin for each problem
 def initialize_using_sa( problem, population_size ):
     pass
@@ -272,9 +272,25 @@ def single_point_mutation( problem, solution):
 # -------------------------------------------------------------------------------------------------
 # Swap mutation
 # -----------------------------------------------------------------------------------------------
-#TODO: Implement Swap mutation
+#TODO: Implement Swap mutation: Done by Rashid @21/12/2019
 def swap_mutation( problem, solution):
-    pass
+    first_point = randint(0, len(solution.representation) -1)
+    second_point = first_point
+
+    while(second_point == first_point):
+        second_point = randint(0, len(solution.representation) -1)
+    
+    gene_1 = solution.representation[first_point]
+    gene_2 = solution.representation[second_point]
+
+    solution.representation[first_point] = gene_2
+    solution.representation[second_point] = gene_1
+ 
+    return solution
+
+    #I am pretty sure we dont need to bring in encoding here.
+    #But if we do... I will take a look at it later.
+    
 
 ###################################################################################################
 # REPLACEMENT APPROACHES
