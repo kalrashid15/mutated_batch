@@ -239,14 +239,14 @@ def singlepoint_crossover( problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # Partially Mapped Crossover
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Partially Mapped Crossover
+# TODO: implement Partially Mapped Crossover: Hugo
 def pmx_crossover( problem, solution1, solution2):
     pass
 
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Cycle Crossover
+# TODO: implement Cycle Crossover: Natalia
 def cycle_crossover( problem, solution1, solution2):
     pass
 
