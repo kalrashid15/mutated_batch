@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 astroid==2.3.3
 Click==7.0
 dash==1.7.0
@@ -29,3 +30,6 @@ typed-ast==1.4.0
 Werkzeug==0.16.0
 wrapt==1.11.2
 xlrd==1.2.0
+=======
+Flask
+>>>>>>> 8217244e88f4d5e4edb298ada79b98bcbbf14c5d
