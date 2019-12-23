@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------
+from pip._internal import main as pipmain
 
 from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
 from cifo.algorithm.hill_climbing import HillClimbing
@@ -23,6 +24,12 @@ from cifo.util.observer import GeneticAlgorithmObserver
 from random import randint
 
 def plot_performance_chart( df ):
+    try:
+        import plotly
+    except ImportError as e:
+        print(e.args)
+        pipmain(['install', 'plotly'])
+    
     import plotly.graph_objects as go
     import plotly.express as px
     from plotly.subplots import make_subplots
