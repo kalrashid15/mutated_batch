@@ -97,7 +97,7 @@ class RouletteWheelSelection:
 
 
 
-        def _select_index(self, population, objective):
+    def _select_index(self, population, objective):
         # for Min: calculate fitness 1/50, 1/30, 1/20 new values. Calculate values (sum of new values). Divide new values by sum of new values
 
         # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
