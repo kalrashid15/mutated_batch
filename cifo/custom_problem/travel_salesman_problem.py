@@ -30,8 +30,6 @@ class TravelSalesmanProblem( ProblemTemplate ):
         """
         # optimize the access to the decision variables
         # ...
-        self._values = []
-        if
 
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
         super().__init__(
