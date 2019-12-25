@@ -49,14 +49,17 @@ class TravelSalesmanProblem( ProblemTemplate ):
     def build_solution(self):
         """
         """
-        pass
+        lista=[]
+        for i in range(len(tsp_encoding_rule["Data"])):
+            lista.append(i+1)
+            random.shuffle(lista)
 
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
     def is_admissible( self, solution ): #<< use this signature in the sub classes, the meta-heuristic 
         """
         """
-        pass
+        Return True
 
     # Evaluate_solution()
     #-------------------------------------------------------------------------------------------------------------
@@ -64,7 +67,13 @@ class TravelSalesmanProblem( ProblemTemplate ):
     def evaluate_solution(self, solution, feedback = None):# << This method does not need to be extended, it already automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
         """
-        pass     
+        solution.append(solution[0])
+        total_fit=0
+        for i in range(len(solution)-1):
+            total_fit+=tsp_encoding_rule["Data"][solution[i]-1][solution[i+1]-1]
+        
+        
+        return total_fit        
 
 
 # -------------------------------------------------------------------------------------------------
