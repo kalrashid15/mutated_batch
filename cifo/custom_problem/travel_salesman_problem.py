@@ -53,13 +53,15 @@ class TravelSalesmanProblem( ProblemTemplate ):
         for i in range(len(tsp_encoding_rule["Data"])):
             lista.append(i+1)
             random.shuffle(lista)
+            
+        return lista
 
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
     def is_admissible( self, solution ): #<< use this signature in the sub classes, the meta-heuristic 
         """
         """
-        Return True
+        return True
 
     # Evaluate_solution()
     #-------------------------------------------------------------------------------------------------------------
