@@ -241,7 +241,57 @@ def singlepoint_crossover( problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Partially Mapped Crossover: Hugo
 def pmx_crossover( problem, solution1, solution2):
-    pass
+
+    
+    StartCrossBar = np.random.randint(0,len(solution1)-2)
+    EndCrossBar = np.random.randint(StartCrossBar+1,len(solution1)-1)
+
+    print(StartCrossBar, EndCrossBar)
+
+    parent1MidCross = solution1[StartCrossBar:EndCrossBar]
+    parent2MidCross = solution2[StartCrossBar:EndCrossBar]
+
+
+
+    temp_child1 = solution1[:StartCrossBar] + parent2MidCross + solution1[EndCrossBar:]
+
+    temp_child2 = solution2[:StartCrossBar] + parent1MidCross + solution2[EndCrossBar:]
+
+    switches = {}
+
+
+    for i in range(len(parent1MidCross)):
+
+        switches.setdefault(parent1MidCross[i], []).append(parent2MidCross[i])
+        switches.setdefault(parent2MidCross[i], []).append(parent1MidCross[i])
+
+    num=0
+    def solve(child, parentMidCross):
+
+        for i in range(len(child)):
+            if i in [x for x in range(StartCrossBar, EndCrossBar)]:
+                continue
+            if child[i] in switches.keys():
+
+                if switches.get(child[i])[0] in parentMidCross:
+                    #print(child[i])
+                    num=switches.get(child[i])[0]
+                    if switches.get(num)[0] in parentMidCross:
+                        print(child[i])
+                        child[i]=switches.get(num)[1]    
+
+                    else:
+                        child[i]=switches.get(num)[0]
+                else:
+                    child[i]=switches.get(child[i])[0]
+
+        return child   
+    
+    offspring1 = solve(temp_child2,parent1MidCross)
+    offspring2 = solve(temp_child1,parent2MidCross)
+    
+    return offspring1, offspring2
+
 
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
