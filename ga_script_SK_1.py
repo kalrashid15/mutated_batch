@@ -27,6 +27,9 @@ from cifo.algorithm.ga_operators import (
 )    
 from cifo.util.terminal import Terminal, FontColor
 from cifo.util.observer import GeneticAlgorithmObserver
+
+from data import tsp_data
+
 from random import randint
 
 #read the data files
@@ -137,6 +140,7 @@ dv = {
 }
 
 #decision variables for TSP
+tsp_dv = tsp_data.run()
 
 #decision variables for PIP
 
@@ -147,12 +151,11 @@ knapsack_problem_instance = KnapsackProblem(
     decision_variables = dv,
     constraints = { "Max-Weight" : 400 })
 
-"""
 travel_salesman_instance = TravelSalesmanProblem(
-    decision_variables = data,
+    decision_variables = tsp_dv,
     constraints = None) 
 
-
+"""
 pip_problem_instance = PortfolioInvestmentProblem (
     decision_variables = pip_dv,
     constraints = {"Max-Investment" : 100000, "Risk-Tolerance": 1, "Risk-free-rate": 1.56}
