@@ -229,3 +229,31 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 # -------------------------------------------------------------------------------------------------
 def pip_bitflip_get_neighbors( solution, problem, neighborhood_size = 0 ):
     pass
+    """
+    neighbors = []
+
+    # Generate all neighbors considering a bit flip
+    for position in range(0, len(solution.representation)):
+        n = deepcopy(solution) # solution.clone()
+        if n.representation[ position ]  ==  1 : 
+            n.representation[ position ] = 0
+        else: 
+            n.representation[ position ] = 1
+        
+        neighbors.append(n)
+
+    # return all neighbors
+    if neighborhood_size == 0:
+        return neighbors
+    # return a RANDOM subset of all neighbors (in accordance with neighborhood size)    
+    else:     
+        subset_neighbors = []
+        indexes = list( range( 0, len( neighbors ) ) )
+        for _ in range(0, neighborhood_size):
+            selected_index = choice( indexes )
+
+            subset_neighbors.append( neighbors[ selected_index ] )
+            indexes.remove( selected_index )
+
+        return subset_neighbors  
+    """

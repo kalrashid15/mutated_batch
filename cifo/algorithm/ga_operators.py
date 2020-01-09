@@ -1,5 +1,6 @@
 from random import uniform, randint, choices
 from copy import deepcopy
+import numpy as np
 
 from cifo.problem.objective import ProblemObjective
 from cifo.problem.solution import EncodingDataType
@@ -243,19 +244,19 @@ def singlepoint_crossover( problem, solution1, solution2):
 def pmx_crossover( problem, solution1, solution2):
 
     
-    StartCrossBar = np.random.randint(0,len(solution1)-2)
-    EndCrossBar = np.random.randint(StartCrossBar+1,len(solution1)-1)
+    StartCrossBar = np.random.randint(0,len(solution1.representation)-2)
+    EndCrossBar = np.random.randint(StartCrossBar+1,len(solution1.representation)-1)
 
     print(StartCrossBar, EndCrossBar)
 
-    parent1MidCross = solution1[StartCrossBar:EndCrossBar]
-    parent2MidCross = solution2[StartCrossBar:EndCrossBar]
+    parent1MidCross = solution1.representation[StartCrossBar:EndCrossBar]
+    parent2MidCross = solution2.representation[StartCrossBar:EndCrossBar]
 
 
 
-    temp_child1 = solution1[:StartCrossBar] + parent2MidCross + solution1[EndCrossBar:]
+    temp_child1 = solution1.representation[:StartCrossBar] + parent2MidCross + solution1.representation[EndCrossBar:]
 
-    temp_child2 = solution2[:StartCrossBar] + parent1MidCross + solution2[EndCrossBar:]
+    temp_child2 = solution2.representation[:StartCrossBar] + parent1MidCross + solution2.representation[EndCrossBar:]
 
     switches = {}
 

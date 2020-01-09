@@ -22,7 +22,8 @@ from cifo.algorithm.ga_operators import (
     RouletteWheelSelection, RankSelection, TournamentSelection, 
     singlepoint_crossover,
     single_point_mutation,
-    elitism_replacement, standard_replacement 
+    elitism_replacement, standard_replacement,
+    pmx_crossover, swap_mutation
 )    
 from cifo.util.terminal import Terminal, FontColor
 from cifo.util.observer import GeneticAlgorithmObserver
@@ -146,7 +147,7 @@ knapsack_problem_instance = KnapsackProblem(
     decision_variables = dv,
     constraints = { "Max-Weight" : 400 })
 
-
+"""
 travel_salesman_instance = TravelSalesmanProblem(
     decision_variables = data,
     constraints = None) 
@@ -156,7 +157,7 @@ pip_problem_instance = PortfolioInvestmentProblem (
     decision_variables = pip_dv,
     constraints = {"Max-Investment" : 100000, "Risk-Tolerance": 1, "Risk-free-rate": 1.56}
 )
-
+"""
 # Configuration
 #--------------------------------------------------------------------------------------------------
 # parent selection object
@@ -173,8 +174,8 @@ params = {
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : singlepoint_crossover,
-        "Mutation-Aproach"          : single_point_mutation,
+        "Crossover-Approach"        : pmx_crossover,
+        "Mutation-Aproach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
