@@ -1,5 +1,6 @@
 from copy import deepcopy
 from random import choice, randint
+import random
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
