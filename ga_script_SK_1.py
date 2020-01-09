@@ -23,7 +23,7 @@ from cifo.algorithm.ga_operators import (
     singlepoint_crossover,
     single_point_mutation,
     elitism_replacement, standard_replacement,
-    pmx_crossover, swap_mutation
+    pmx_crossover, swap_mutation, cycle_crossover
 )    
 from cifo.util.terminal import Terminal, FontColor
 from cifo.util.observer import GeneticAlgorithmObserver
@@ -177,7 +177,7 @@ params = {
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : pmx_crossover,
+        "Crossover-Approach"        : cycle_crossover,
         "Mutation-Aproach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
