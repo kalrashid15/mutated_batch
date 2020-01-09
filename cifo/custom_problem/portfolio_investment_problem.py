@@ -8,6 +8,7 @@ from cifo.problem.solution import LinearSolution, Encoding
 from collections import Counter
 
 import numpy as np
+import pandas as pd
 
 pip_encoding_rule = {
     "Size"         : -1, # It must be defined by the size of DV (Number of products)
@@ -124,6 +125,23 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             FInd the Corr between assets in the portfoilo
 
         """
+        #calcuate cov_matrix
+        df_stocks = pd.read_excel(r'./data/sp_12_weeks.xlsx')
+
+        def cal_pfolio_risk(portfolio):
+            #find the list of stocks and their weights
+
+            count = Counter(portfolio).items()
+            percentages = {x: float(float(y) / len(portfolio) * 100.00) for x, y in count}
+            
+            list_of_stocks = percentages.keys()
+            weight_of_stocks = np.array(percentages.values())
+
+            cov_mat = df_stocks[list_of_stocks].cov()
+            pfolio_risk = np.sqrt(np.dot(weight_of_stocks.T, np.dot(cov_mat, weight_of_stocks)))
+
+            return pfolio_risk
+        
         #defining a function to calcuate total investment of portfolio
         def cal_total_investment(porfolio):
             total_investment = 0
@@ -133,37 +151,32 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             return total_investment 
 
         #calculating total return
-        def cal_total_return(porfolio):
+        def cal_total_return(portfolio):
             total_return = 0
-            for stock in porfolio:
+            for stock in portfolio:
                 i = self._stocks.index(stock)
                 total_return += float(self._exp_rets[i])
             return total_return
 
-        def cal_total_std(porfolio):
-            total_std = 0
-            for stock in porfolio:
-                i = self._stocks.index(stock)
-                total_return += float(self._stdivs[i])
-            return total_std
         
         #defining a function to calcuate total risk of a porfoilio
-        def cal_pfolio_sR(porfolio):
+        def cal_pfolio_sR(portfolio):
             #Sharpe Ratio = (Rx – Rf) / StdDev Rx
 
-            #I dont think we need the weight here. But
-            count = Counter(porfolio).items()
-            percentages = {x: float(float(y) / len(porfolio) * 100.00) for x, y in count}
+
+            #not efficient way of calcuating sharpe ratio
+            # pfolio_ret = cal_total_return(porfolio)
+            # rf_ret = self._rf_rate
+            # pfolio_std = cal_total_std(porfolio)
+            # pfolio_sR = float((pfolio_ret - rf_ret) / pfolio_std)
             
-            list_of_stocks = percentages.keys()
-            weight_of_stocks = np.array(percentages.values())
+            #calcuating the nominitor
+            pfolio_exp_ret = cal_total_return(portfolio) -  self._rf_rate
 
-            #calcuating sharpe ratio
-            pfolio_ret = cal_total_return(porfolio)
-            rf_ret = self._rf_rate
-            pfolio_std = cal_total_std(porfolio)
+            #calcuating the denominitor
+            pfolio_std_div = cal_pfolio_risk(portfolio)
 
-            pfolio_sR = float((pfolio_ret - rf_ret) / pfolio_std)
+            pfolio_sR = pfolio_exp_ret / pfolio_std_div
 
             return pfolio_sR
             
