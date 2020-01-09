@@ -266,7 +266,6 @@ def pmx_crossover( problem, solution1, solution2):
         switches.setdefault(parent1MidCross[i], []).append(parent2MidCross[i])
         switches.setdefault(parent2MidCross[i], []).append(parent1MidCross[i])
 
-    num=0
     def solve(child, parentMidCross):
 
         for i in range(len(child)):
