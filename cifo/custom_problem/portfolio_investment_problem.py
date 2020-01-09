@@ -135,7 +135,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             percentages = {x: float(float(y) / len(portfolio) * 100.00) for x, y in count}
             
             list_of_stocks = percentages.keys()
-            weight_of_stocks = np.array(percentages.values())
+            weight_of_stocks = np.array([float(x) for x in list(percentages.values())])
 
             cov_mat = df_stocks[list_of_stocks].cov()
             pfolio_risk = np.sqrt(np.dot(weight_of_stocks.T, np.dot(cov_mat, weight_of_stocks)))
@@ -208,8 +208,19 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
     # It should be seen as an abstract method 
     def evaluate_solution(self, solution, feedback = None):# << This method does not need to be extended, it already automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
+        highest fitness, based on highest return
         """
-        pass     
+        stocks = self._stocks
+
+        fitness = 0
+        
+        for  i in range(0, len( stocks )):
+            if solution.representation[ i ] == 1:
+                fitness += float(self._exp_rets[self._stocks.index(solution.representation[ i ])])#need to check this
+        
+        solution.fitness = fitness
+
+        return solution      
 
 
 # -------------------------------------------------------------------------------------------------
