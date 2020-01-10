@@ -227,13 +227,18 @@ class TournamentSelection:
 def singlepoint_crossover( problem, solution1, solution2):
     singlepoint = randint(0, len(solution1.representation)-1)
     #print(f" >> singlepoint: {singlepoint}")
-
+    #print(f'type of solution ', type(solution1))
     offspring1 = deepcopy(solution1) #solution1.clone()
     offspring2 = deepcopy(solution2) #.clone()
 
     for i in range(singlepoint, len(solution2.representation)):
         offspring1.representation[i] = solution2.representation[i]
         offspring2.representation[i] = solution1.representation[i]
+
+        #print(f'print offspring1', offspring1)
+        #print(f'print offspring2', offspring2)
+
+        #print(f'types:', type(offspring1))
 
     return offspring1, offspring2    
 
@@ -297,52 +302,61 @@ def pmx_crossover( problem, solution1, solution2):
 # Cycle Crossover
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Cycle Crossover: Natalia
-class Chromosome():
-    """
-    Description of class `Chromosome` goes here
-    """
-    def __init__(self, genes, id_=None, fitness=-1):
-        self.id_ = id_
-        self.genes = genes
-        self.fitness = fitness
-
-    def describe(self):
-        """
-        Prints the ID, fitness, and genes
-        """
-        #print('ID=#{}, fitenss={}, \ngenes=\n{}'.format(self.id, self.fitness, self.genes))
-        print(f"ID=#{self.id_}, Fitness={self.fitness}, \nGenes=\n{self.genes}")
-
-    def get_chrom_length(self):
-        """
-        Returns the length of `self.genes`
-        """
-        return len(self.genes)    
-
 
 def cycle_crossover(problem, solution1, solution2):
     """
     This function takes two parents, and performs Cycle crossover on them. 
     pc: The probability of crossover (control parameter)
     """
+    print(solution1.representation)
+    #P1['genes'] = solution1.representation
     parent_one = solution1.representation
-    parent_two = solution2.representation
-    parent_one = Chromosome(genes=np.array(parent_one), id_=0, fitness=125.2)
-    parent_two = Chromosome(genes=np.array(parent_two), id_=1, fitness=125.2)
+    parent_two = list(solution2.representation)
+    chrom_length = len(solution1.representation)
+    
+    P1 = {
+        'genes': parent_one,
+        'id': 0,
+        'fitness': 123.2
+    }
+    P2 = {
+        'genes': parent_two,
+        'id': 1,
+        'fitness': 123.2
+    }
+    
     #parent_one = Chromosome(genes=np.array(solution1), id_=0, fitness=125.2)
     #parent_two = Chromosome(genes=np.array(solution2), id_=1, fitness=125.2)    
     
-    chrom_length = Chromosome.get_chrom_length(parent_one)
+    #chrom_length = Chromosome.get_chrom_length(parent_one)
     print("\nParents")
     print("=================================================")
-    Chromosome.describe(parent_one)
-    Chromosome.describe(parent_two)
-    offspring1 = Chromosome(genes=np.array([-1] * chrom_length), id_=0, fitness=125.2)
-    offspring2 = Chromosome(genes=np.array([-1] * chrom_length), id_=1, fitness=125.2)
+    print(P1['genes'])
+    print(P2['genes'])
+    
+    #Chromosome.describe(parent_one)
+    #Chromosome.describe(parent_two)
+    
+    #offspring1 = Chromosome(genes=np.array([-1] * chrom_length), id_=0, fitness=125.2)
+    #offspring2 = Chromosome(genes=np.array([-1] * chrom_length), id_=1, fitness=125.2)
 
+    Off1 = {
+        'genes': np.array([-1] * chrom_length),
+        'id': 0,
+        'fitness': 132.2
+    }
+    
+    Off2 = {
+        'genes': np.array([-1] * chrom_length),
+        'id': 1,
+        'fitness': 132.2
+    }
+    
+    
+    
     if np.random.random() < 1:  # if pc is greater than random number
-        p1_copy = parent_one.genes.tolist()
-        p2_copy = parent_two.genes.tolist()
+        p1_copy = P1['genes']
+        p2_copy = P2['genes']
         swap = True
         count = 0
         pos = 0
@@ -351,47 +365,48 @@ def cycle_crossover(problem, solution1, solution2):
             if count > chrom_length:
                 break
             for i in range(chrom_length):
-                if offspring1.genes[i] == -1:
+                if Off1['genes'][i] == -1:
                     pos = i
                     break
 
             if swap:
                 while True:
-                    offspring1.genes[pos] = parent_one.genes[pos]
+                    Off1['genes'][pos] = P1['genes'][pos]
                     count += 1
-                    pos = parent_two.genes.tolist().index(parent_one.genes[pos])
+                    #pos = P2['genes'].index(P1['genes'][pos])
                     if p1_copy[pos] == -1:
                         swap = False
                         break
                     p1_copy[pos] = -1
             else:
                 while True:
-                    offspring1.genes[pos] = parent_two.genes[pos]
+                    Off1['genes'][pos] = P2['genes'][pos]
                     count += 1
-                    pos = parent_one.genes.tolist().index(parent_two.genes[pos])
+                    pos = P1['genes'].index(P2['genes'][pos])
                     if p2_copy[pos] == -1:
                         swap = True
                         break
                     p2_copy[pos] = -1
 
         for i in range(chrom_length): #for the second child
-            if offspring1.genes[i] == parent_one.genes[i]:
-                offspring2.genes[i] = parent_two.genes[i]
+            if Off1['genes'][i] == P1['genes'][i]:
+                Off2['genes'][i] = P2['genes'][i]
             else:
-                offspring2.genes[i] = parent_one.genes[i]
+                Off2['genes'][i] = P1['genes'][i]
 
         for i in range(chrom_length): #Special mode
-            if offspring1.genes[i] == -1:
+            if Off1['genes'][i] == -1:
                 if p1_copy[i] == -1: #it means that the ith gene from p1 has been already transfered
-                    offspring1.genes[i] = parent_two.genes[i]
+                    Off1['genes'][i] = P2['genes'][i]
                 else:
-                    offspring1.genes[i] = parent_one.genes[i]
+                    Off1['genes'][i] = P1['genes'][i]
+        offspring1 = Off1['genes']
+        offspring2 = Off2['genes']
 
     else:  # if pc is less than random number then don't make any change
         offspring1 = deepcopy(parent_one)
         offspring2 = deepcopy(parent_two)
     return offspring1, offspring2
-
 ###################################################################################################
 # MUTATION APPROACHES
 ###################################################################################################

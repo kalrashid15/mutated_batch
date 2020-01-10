@@ -169,16 +169,16 @@ parent_selection = TournamentSelection()
 
 params = {
         # params
-        "Population-Size"           : 20,
-        "Number-of-Generations"     : 13,
+        "Population-Size"           : 10,
+        "Number-of-Generations"     : 2,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : cycle_crossover,
-        "Mutation-Aproach"          : swap_mutation,
+        "Crossover-Approach"        : singlepoint_crossover,
+        "Mutation-Aproach"          : single_point_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
