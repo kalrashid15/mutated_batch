@@ -227,13 +227,10 @@ class TournamentSelection:
 def singlepoint_crossover( problem, solution1, solution2):
     print(f"Problem: {problem}\nSolution1: {solution1}\nSolution2: {solution2}")
     singlepoint = randint(0, len(solution1.representation)-1)
-<<<<<<< HEAD
     #print(f" >> singlepoint: {singlepoint}")
     #print(f'type of solution ', type(solution1))
-=======
     # print(f" >> singlepoint: {singlepoint}")
 
->>>>>>> c867c5c994dd5236608fc8a904d568e541666fa8
     offspring1 = deepcopy(solution1) #solution1.clone()
     offspring2 = deepcopy(solution2) #.clone()
 
@@ -252,157 +249,180 @@ def singlepoint_crossover( problem, solution1, solution2):
 # Partially Mapped Crossover
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Partially Mapped Crossover: Hugo
-def pmx_crossover( problem, solution1, solution2):
-
-    
-    StartCrossBar = np.random.randint(0,len(solution1.representation)-2)
-    EndCrossBar = np.random.randint(StartCrossBar+1,len(solution1.representation)-1)
-
-    print(StartCrossBar, EndCrossBar)
-
-    parent1MidCross = solution1.representation[StartCrossBar:EndCrossBar]
-    parent2MidCross = solution2.representation[StartCrossBar:EndCrossBar]
+def pmx_crossover( problem, sol1, sol2):
 
 
+    def recursion1 (temp_child , firstCrossPoint , secondCrossPoint , solution1MiddleCross , solution2MiddleCross, relations) :
+        child = np.array([0 for i in range(len(solution1))])
 
-    temp_child1 = solution1.representation[:StartCrossBar] + parent2MidCross + solution1.representation[EndCrossBar:]
+        #check if has mapping on the first part before the first crossover point
+        for i,j in enumerate(temp_child[:firstCrossPoint]):
+            c=0
+            #check if each item is in the relations list and replace it
+            for x in relations:
+                if j == x[0]:
+                    child[i]=x[1]
+                    c=1
+                    break
+            if c==0:
+                child[i]=j
+        j=0
 
-    temp_child2 = solution2.representation[:StartCrossBar] + parent1MidCross + solution2.representation[EndCrossBar:]
 
-    switches = {}
+        for i in range(firstCrossPoint,secondCrossPoint):
+            child[i]=solution2MiddleCross[j]
+            j+=1
+
+        for i,j in enumerate(temp_child[secondCrossPoint:]):
+            c=0
+            for x in relations:
+                if j == x[0]:
+                    child[i+secondCrossPoint]=x[1]
+                    c=1
+                    break
+            if c==0:
+                child[i+secondCrossPoint]=j
+        child_unique=np.unique(child)
+        if len(child)>len(child_unique):
+            child=recursion1(child,firstCrossPoint,secondCrossPoint,solution1MiddleCross,solution2MiddleCross, relations)
+        return(child)
+
+    def recursion2(temp_child,firstCrossPoint,secondCrossPoint,solution1MiddleCross,solution2MiddleCross, relations):
+        child = np.array([0 for i in range(len(solution1))])
+        for i,j in enumerate(temp_child[:firstCrossPoint]):
+            c=0
+            for x in relations:
+                if j == x[1]:
+                    child[i]=x[0]
+                    c=1
+                    break
+            if c==0:
+                child[i]=j
+        j=0
+        for i in range(firstCrossPoint,secondCrossPoint):
+            child[i]=solution1MiddleCross[j]
+            j+=1
+
+        for i,j in enumerate(temp_child[secondCrossPoint:]):
+            c=0
+            for x in relations:
+                if j == x[1]:
+                    child[i+secondCrossPoint]=x[0]
+                    c=1
+                    break
+            if c==0:
+                child[i+secondCrossPoint]=j
+        child_unique=np.unique(child)
+        if len(child)>len(child_unique):
+            child=recursion2(child,firstCrossPoint,secondCrossPoint,solution1MiddleCross,solution2MiddleCross,relations)
+        return(child)
+
+    offspring1 = deepcopy(sol1) #solution1.clone()
+    offspring2 = deepcopy(sol2) #.clone()
 
 
-    for i in range(len(parent1MidCross)):
+    solution1 = sol1.representation
+    solution2 = sol2.representation
 
-        switches.setdefault(parent1MidCross[i], []).append(parent2MidCross[i])
-        switches.setdefault(parent2MidCross[i], []).append(parent1MidCross[i])
 
-    def solve(child, parentMidCross):
+    #select the first point
+    firstCrossPoint = np.random.randint(0,len(solution1)-2)
 
-        for i in range(len(child)):
-            if i in [x for x in range(StartCrossBar, EndCrossBar)]:
-                continue
-            if child[i] in switches.keys():
+    #select the second point
+    secondCrossPoint = np.random.randint(firstCrossPoint+1,len(solution1)-1)
 
-                if switches.get(child[i])[0] in parentMidCross:
-                    #print(child[i])
-                    num=switches.get(child[i])[0]
-                    if switches.get(num)[0] in parentMidCross:
-                        print(child[i])
-                        child[i]=switches.get(num)[1]    
+    #select the range between first and second point
+    solution1MiddleCross = solution1[firstCrossPoint:secondCrossPoint]
+    solution2MiddleCross = solution2[firstCrossPoint:secondCrossPoint]
 
-                    else:
-                        child[i]=switches.get(num)[0]
-                else:
-                    child[i]=switches.get(child[i])[0]
+    #create 2 temp children using midlecross and the rest of the other parent
+    temp_child1 = list(solution1[:firstCrossPoint]) + list(solution2MiddleCross) + list(solution1[secondCrossPoint:])
+    temp_child2 = list(solution2[:firstCrossPoint]) + list(solution1MiddleCross) + list(solution2[secondCrossPoint:])
 
-        return child   
-    
-    offspring1 = solve(temp_child2,parent1MidCross)
-    offspring2 = solve(temp_child1,parent2MidCross)
-    
+    #define the relations between the parents (mapping)
+    relations = []
+    for i in range(len(solution1MiddleCross)):
+        relations.append([solution2MiddleCross[i], solution1MiddleCross[i]])
+
+    #create the childrens
+    offspring_representation_1=recursion1(temp_child1,firstCrossPoint,secondCrossPoint,solution1MiddleCross,solution2MiddleCross,relations)
+    offspring_representation_2=recursion2(temp_child2,firstCrossPoint,secondCrossPoint,solution1MiddleCross,solution2MiddleCross,relations)
+
+    offspring1.representation = offspring_representation_1
+    offspring2.representation = offspring_representation_2
+
     return offspring1, offspring2
-
-
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Cycle Crossover: Natalia
 
 def cycle_crossover(problem, solution1, solution2):
-    """
-    This function takes two parents, and performs Cycle crossover on them. 
-    pc: The probability of crossover (control parameter)
-    """
-    chrom_length = len(solution1.representation)
-    #print(f" >> singlepoint: {singlepoint}")
-    #print(f'type of solution ', type(solution1))
-    parent1 = deepcopy(solution1) #solution1.clone()
-    parent2 = deepcopy(solution2) #.clone()
+    parent1 = deepcopy(solution1)
+    parent2 = deepcopy(solution2)
+    
+    print(parent1)
+    print(parent2)
+    
+    chrom_length = len(parent1.representation)
+    print(chrom_length)
+    
+    offspring1 = deepcopy(parent1)
+    offspring2 = deepcopy(parent2)
+    
+    offspring1.representation = [-1] * chrom_length
+    offspring2.representation = [-1] * chrom_length
 
-    for i in range(singlepoint, len(solution2.representation)):
-        offspring1.representation[i] = solution2.representation[i]
-        offspring2.representation[i] = solution1.representation[i]
-
-    #chrom_length = Chromosome.get_chrom_length(parent_one)
-    print("\nParents")
-    print("=================================================")
-    print(parent1.representation)
-    print(parent2.representation)
     
-    #Chromosome.describe(parent_one)
-    #Chromosome.describe(parent_two)
+    p1_copy = deepcopy(parent1)
+    p2_copy = deepcopy(parent2)
+    swap = True
+    count = 0
+    pos = 0
     
-    #offspring1 = Chromosome(genes=np.array([-1] * chrom_length), id_=0, fitness=125.2)
-    #offspring2 = Chromosome(genes=np.array([-1] * chrom_length), id_=1, fitness=125.2)
-
-    Off1 = {
-        'genes': np.array([-1] * chrom_length),
-        'id': 0,
-        'fitness': 132.2
-    }
-    
-    Off2 = {
-        'genes': np.array([-1] * chrom_length),
-        'id': 1,
-        'fitness': 132.2
-    }
-    
-    
-    
-    if np.random.random() < 1:  # if pc is greater than random number
-        p1_copy = P1['genes']
-        p2_copy = P2['genes']
-        swap = True
-        count = 0
-        pos = 0
-
-        while True:
-            if count > chrom_length:
+    while True:
+        if count > chrom_length:
+            break
+        for i in range(chrom_length):
+            if offspring1.representation[i] == -1:
+                pos = i
                 break
-            for i in range(chrom_length):
-                if Off1['genes'][i] == -1:
-                    pos = i
-                    break
-
-            if swap:
+    
+        if swap:
                 while True:
-                    Off1['genes'][pos] = P1['genes'][pos]
+                    offspring1.representation[pos] = parent1.representation[pos]
                     count += 1
-                    pos = P2['genes'].index(P1['genes'][pos])
-                    if p1_copy[pos] == -1:
+                    pos = parent2.representation.index(parent1.representation[pos])
+                    if p1_copy.representation[pos] == -1:
                         swap = False
                         break
-                    p1_copy[pos] = -1
-            else:
-                while True:
-                    Off1['genes'][pos] = P2['genes'][pos]
-                    count += 1
-                    pos = P1['genes'].index(P2['genes'][pos])
-                    if p2_copy[pos] == -1:
-                        swap = True
-                        break
-                    p2_copy[pos] = -1
+                    p1_copy.representation[pos] = -1
+        else:
+            while True:
+                parent1.representation[pos] = parent2.representation[pos]
+                count += 1
+                pos = parent1.representation.index(parent2.representation[pos])
+                if p2_copy.representation[pos] == -1:
+                    swap = True
+                    break
+                p2_copy.representation[pos] = -1
 
         for i in range(chrom_length): #for the second child
-            if Off1['genes'][i] == P1['genes'][i]:
-                Off2['genes'][i] = P2['genes'][i]
+            if offspring1.representation[i] == parent1.representation[i]:
+                offspring2.representation[i] = parent2.representation[i]
             else:
-                Off2['genes'][i] = P1['genes'][i]
+                offspring2.representation[i] = parent1.representation[i]
 
         for i in range(chrom_length): #Special mode
-            if Off1['genes'][i] == -1:
-                if p1_copy[i] == -1: #it means that the ith gene from p1 has been already transfered
-                    Off1['genes'][i] = P2['genes'][i]
+            if offspring1.representation[i] == -1:
+                if p1_copy.representation[i] == -1: #it means that the ith gene from p1 has been already transfered
+                    offspring1.representation[i] = parent2.representation[i]
                 else:
-                    Off1['genes'][i] = P1['genes'][i]
-        offspring1 = Off1['genes']
-        offspring2 = Off2['genes']
-        print(f'type of offprint CC', offspring1)
+                    offspring1.representation[i] = parent1.representation[i]
 
     else:  # if pc is less than random number then don't make any change
-        offspring1 = deepcopy(parent_one)
-        offspring2 = deepcopy(parent_two)
+        offspring1 = deepcopy(parent1)
+        offspring2 = deepcopy(parent2)
     return offspring1, offspring2
 ###################################################################################################
 # MUTATION APPROACHES
