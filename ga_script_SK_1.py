@@ -140,7 +140,15 @@ dv = {
 }
 
 #decision variables for TSP
-tsp_dv = tsp_data.run()
+# tsp_dv = tsp_data.run()
+
+#converting pd to dict to maintain similarities with the project
+df_TSP = pd.read_excel(r'./data/TSP_data.xlsx')
+df_TSP.rename({"Unnamed: 3": "City_id"}, axis=1, inplace=True)
+tsp_dv = df_TSP.to_dict('list')
+
+# df_TSP.head()
+
 
 #decision variables for PIP
 
@@ -177,8 +185,13 @@ params = {
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
+<<<<<<< HEAD
         "Crossover-Approach"        : cycle_crossover,
         "Mutation-Aproach"          : single_point_mutation,
+=======
+        "Crossover-Approach"        : singlepoint_crossover,
+        "Mutation-Aproach"          : swap_mutation,
+>>>>>>> c867c5c994dd5236608fc8a904d568e541666fa8
         "Replacement-Approach"      : elitism_replacement
     }
 

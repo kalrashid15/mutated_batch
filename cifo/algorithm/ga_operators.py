@@ -225,9 +225,15 @@ class TournamentSelection:
 # Singlepoint crossover
 # -------------------------------------------------------------------------------------------------
 def singlepoint_crossover( problem, solution1, solution2):
+    print(f"Problem: {problem}\nSolution1: {solution1}\nSolution2: {solution2}")
     singlepoint = randint(0, len(solution1.representation)-1)
+<<<<<<< HEAD
     #print(f" >> singlepoint: {singlepoint}")
     #print(f'type of solution ', type(solution1))
+=======
+    # print(f" >> singlepoint: {singlepoint}")
+
+>>>>>>> c867c5c994dd5236608fc8a904d568e541666fa8
     offspring1 = deepcopy(solution1) #solution1.clone()
     offspring2 = deepcopy(solution2) #.clone()
 
