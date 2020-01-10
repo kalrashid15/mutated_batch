@@ -311,8 +311,8 @@ def cycle_crossover(problem, solution1, solution2):
     print(solution1.representation)
     #P1['genes'] = solution1.representation
     parent_one = solution1.representation
-    parent_two = list(solution2.representation)
-    chrom_length = len(solution1.representation)
+    parent_two = solution2.representation
+    chrom_length = len(parent_two)
     
     P1 = {
         'genes': parent_one,
@@ -373,7 +373,7 @@ def cycle_crossover(problem, solution1, solution2):
                 while True:
                     Off1['genes'][pos] = P1['genes'][pos]
                     count += 1
-                    #pos = P2['genes'].index(P1['genes'][pos])
+                    pos = P2['genes'].index(P1['genes'][pos])
                     if p1_copy[pos] == -1:
                         swap = False
                         break
@@ -402,6 +402,7 @@ def cycle_crossover(problem, solution1, solution2):
                     Off1['genes'][i] = P1['genes'][i]
         offspring1 = Off1['genes']
         offspring2 = Off2['genes']
+        print(f'type of offprint CC', offspring1)
 
     else:  # if pc is less than random number then don't make any change
         offspring1 = deepcopy(parent_one)
