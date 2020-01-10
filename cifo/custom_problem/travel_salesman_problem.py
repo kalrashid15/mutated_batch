@@ -1,6 +1,7 @@
 from copy import deepcopy
 from random import choice, randint
 import random
+import pandas as pd
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
@@ -10,8 +11,8 @@ tsp_encoding_rule = {
     "Size"         : -1, # It must be defined by the size of DV (Number of products)
     "Is ordered"   : True,
     "Can repeat"   : False,
-    "Data"         : [0,0], # must be defined by the data
-    "Data Type"    : ""
+    "Data"         : [0,1],
+    "Data Type"    : "Choices"
 }
 
 
@@ -30,7 +31,15 @@ class TravelSalesmanProblem( ProblemTemplate ):
         """
         """
         # optimize the access to the decision variables
-        # ...
+
+        # TODO: extract attributes
+        self._cities = decision_variables["City"]
+        self._xcoords = decision_variables["X"]
+        self._ycoords = decision_variables["Y"]
+        self._distancematrix = pd.DataFrame(decision_variables).drop(["City_id", "City", "X", "Y"], axis=1)
+        
+        encoding_rule["Size"] = len( self._cities )
+
 
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
         super().__init__(
@@ -50,17 +59,18 @@ class TravelSalesmanProblem( ProblemTemplate ):
     def build_solution(self):
         """
         """
-        lista=[]
-        for i in range(len(tsp_encoding_rule["Data"])):
-            lista.append(i+1)
-            random.shuffle(lista)
+        new_solution = []
+        for i in range(encoding_rule["Size"]):
+            new_solution.append(i)
+        random.shuffle(new_solution)
             
-        return lista
+        return new_solution
 
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
     def is_admissible( self, solution ): #<< use this signature in the sub classes, the meta-heuristic 
         """
+        Solution length is always 90 so let's just return True.
         """
         return True
 
@@ -71,10 +81,13 @@ class TravelSalesmanProblem( ProblemTemplate ):
         """
         """
         solution.append(solution[0])
-        total_fit=0
-        for i in range(len(solution)-1):
-            total_fit+=tsp_encoding_rule["Data"][solution[i]-1][solution[i+1]-1]
-        
+        total_fit = 0
+
+        for i in range(len(solution)):
+            origin = solution[i-1]
+            destination = solution[i]
+            
+            total_fit += self._distancematrix.loc[origin, destination]
         
         return total_fit        
 
