@@ -308,31 +308,21 @@ def cycle_crossover(problem, solution1, solution2):
     This function takes two parents, and performs Cycle crossover on them. 
     pc: The probability of crossover (control parameter)
     """
-    print(solution1.representation)
-    #P1['genes'] = solution1.representation
-    parent_one = solution1.representation
-    parent_two = solution2.representation
-    chrom_length = len(parent_two)
-    
-    P1 = {
-        'genes': parent_one,
-        'id': 0,
-        'fitness': 123.2
-    }
-    P2 = {
-        'genes': parent_two,
-        'id': 1,
-        'fitness': 123.2
-    }
-    
-    #parent_one = Chromosome(genes=np.array(solution1), id_=0, fitness=125.2)
-    #parent_two = Chromosome(genes=np.array(solution2), id_=1, fitness=125.2)    
-    
+    chrom_length = len(solution1.representation)
+    #print(f" >> singlepoint: {singlepoint}")
+    #print(f'type of solution ', type(solution1))
+    parent1 = deepcopy(solution1) #solution1.clone()
+    parent2 = deepcopy(solution2) #.clone()
+
+    for i in range(singlepoint, len(solution2.representation)):
+        offspring1.representation[i] = solution2.representation[i]
+        offspring2.representation[i] = solution1.representation[i]
+
     #chrom_length = Chromosome.get_chrom_length(parent_one)
     print("\nParents")
     print("=================================================")
-    print(P1['genes'])
-    print(P2['genes'])
+    print(parent1.representation)
+    print(parent2.representation)
     
     #Chromosome.describe(parent_one)
     #Chromosome.describe(parent_two)
