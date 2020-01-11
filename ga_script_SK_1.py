@@ -184,7 +184,7 @@ parent_selection = TournamentSelection()
 params = {
         # params
         "Population-Size"           : 20,
-        "Number-of-Generations"     : 50,
+        "Number-of-Generations"     : 100,
         "Crossover-Probability"     : 0.9,
         "Mutation-Probability"      : 0.9,
         # operators / approaches
