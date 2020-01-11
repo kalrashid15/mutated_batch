@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------
+
+
 from pip._internal import main as pipmain
 
 from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
@@ -37,7 +39,7 @@ import pandas as pd
 
 #read PIP datafiles into pandas df
 df_PIP = pd.read_excel(r'./data/sp500_gen.xlsx')
-print(df_PIP['symbol'])
+#print(df_PIP['symbol'])
 
 #converting pd to dict to maintain similarities with the project
 pip_dv = df_PIP.to_dict('list')
@@ -163,17 +165,17 @@ travel_salesman_instance = TravelSalesmanProblem(
     decision_variables = tsp_dv,
     constraints = None) 
 
-"""
+
 pip_problem_instance = PortfolioInvestmentProblem (
     decision_variables = pip_dv,
     constraints = {"Max-Investment" : 100000, "Risk-Tolerance": 1, "Risk-free-rate": 1.56}
 )
-"""
+
 # Configuration
 #--------------------------------------------------------------------------------------------------
 # parent selection object
-parent_selection = TournamentSelection()
-#parent_selection = RouletteWheelSelection()
+#parent_selection = TournamentSelection()
+parent_selection = RouletteWheelSelection()
 
 params = {
         # params
