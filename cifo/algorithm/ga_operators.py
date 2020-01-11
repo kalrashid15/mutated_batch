@@ -1,5 +1,6 @@
 from random import uniform, randint, choices
 from copy import deepcopy
+import random
 import numpy as np
 
 from cifo.problem.objective import ProblemObjective
@@ -237,7 +238,7 @@ class TournamentSelection:
 # Singlepoint crossover
 # -------------------------------------------------------------------------------------------------
 def singlepoint_crossover( problem, solution1, solution2):
-    print(f"Problem: {problem}\nSolution1: {solution1}\nSolution2: {solution2}")
+    print(f"Singlepoint Crossover\nProblem: {problem}\nSolution1: {solution1}\nSolution2: {solution2}")
     singlepoint = randint(0, len(solution1.representation)-1)
 
 
@@ -256,104 +257,42 @@ def singlepoint_crossover( problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Partially Mapped Crossover: Hugo
 def pmx_crossover(problem, solution1, solution2):
-    
-    parent1 = deepcopy(solution1.representation)
-    parent2 = deepcopy(solution2.representation)
-    
-    firstCrossPoint = np.random.randint(0,len(parent1)-2)
-    secondCrossPoint = np.random.randint(firstCrossPoint+1,len(parent1)-1)
-
-    #firstCrossPoint = 3
-    #secondCrossPoint = 6
-
-    print(firstCrossPoint, secondCrossPoint)
-
-    parent1MiddleCross = parent1[firstCrossPoint:secondCrossPoint]
-    parent2MiddleCross = parent2[firstCrossPoint:secondCrossPoint]
-
-    temp_child1 = parent1[:firstCrossPoint] + parent2MiddleCross + parent1[secondCrossPoint:]
-
-    temp_child2 = parent2[:firstCrossPoint] + parent1MiddleCross + parent2[secondCrossPoint:]
-
-    relations = []
-    for i in range(len(parent1MiddleCross)):
-        relations.append([parent2MiddleCross[i], parent1MiddleCross[i]])
-
-    print(relations)
-
-    def recursion1 (temp_child , firstCrossPoint , secondCrossPoint , parent1MiddleCross , parent2MiddleCross) :
-        child = np.array([0 for i in range(len(parent1))])
-        while True:
-            for i,j in enumerate(temp_child[:firstCrossPoint]):
-                c=0
-                for x in relations:
-                    if j == x[0]:
-                        child[i]=x[1]
-                        c=1
-                        break
-                if c==0:
-                    child[i]=j
-            j=0
-            for i in range(firstCrossPoint,secondCrossPoint):
-                child[i]=parent2MiddleCross[j]
-                j+=1
-
-            for i,j in enumerate(temp_child[secondCrossPoint:]):
-                c=0
-                for x in relations:
-                    if j == x[0]:
-                        child[i+secondCrossPoint]=x[1]
-                        c=1
-                        break
-                if c==0:
-                    child[i+secondCrossPoint]=j
-            child_unique=np.unique(child)
-            if len(child) <= len(child_unique):
-                break
-                #child=recursion1(child,firstCrossPoint,secondCrossPoint,parent1MiddleCross,parent2MiddleCross)
-        return(child)
-
     """
-    def recursion2(temp_child,firstCrossPoint,secondCrossPoint,parent1MiddleCross,parent2MiddleCross):
-        child = np.array([0 for i in range(len(parent1))])
-        for i,j in enumerate(temp_child[:firstCrossPoint]):
-            c=0
-            for x in relations:
-                if j == x[1]:
-                    child[i]=x[0]
-                    c=1
-                    break
-            if c==0:
-                child[i]=j
-        j=0
-        for i in range(firstCrossPoint,secondCrossPoint):
-            child[i]=parent1MiddleCross[j]
-            j+=1
-
-        for i,j in enumerate(temp_child[secondCrossPoint:]):
-            c=0
-            for x in relations:
-                if j == x[1]:
-                    child[i+secondCrossPoint]=x[0]
-                    c=1
-                    break
-            if c==0:
-                child[i+secondCrossPoint]=j
-        child_unique=np.unique(child)
-        if len(child)>len(child_unique):
-            child=recursion2(child,firstCrossPoint,secondCrossPoint,parent1MiddleCross,parent2MiddleCross)
-        return(child)
-    
     """
-    child1=recursion1(temp_child1,firstCrossPoint,secondCrossPoint,parent1MiddleCross,parent2MiddleCross)
-    child2=recursion1(temp_child2,firstCrossPoint,secondCrossPoint,parent1MiddleCross,parent2MiddleCross)
+    parent1 = solution1.representation
+    parent2 = solution2.representation
+    
+    size = min(len(parent1), len(parent2))
+    p1, p2 = [0] * size, [0] * size
 
+    # Initialize the position of each indices in the individuals
+    for i in range(size):
+        p1[parent1[i]] = i
+        p2[parent2[i]] = i
+    
+    # Choose crossover points
+    crossoverpoint1 = random.randint(0, size)
+    crossoverpoint2 = random.randint(0, size - 1)
+    if crossoverpoint2 >= crossoverpoint1:
+        crossoverpoint2 += 1
+    else:  # Swap the two crossover points
+        crossoverpoint1, crossoverpoint2 = crossoverpoint2, crossoverpoint1
+  
     offspring1 = deepcopy(solution1)
-    offspring2 = deepcopy(solution2)
+    offspring2 = deepcopy(solution2)   
     
-    offspring1.representation = child1
-    offspring2.representation = child2
-    
+    # Apply crossover between cx points
+    for i in range(crossoverpoint1, crossoverpoint2):
+        # Keeping track of the selected values
+        aux1 = parent1[i]
+        aux2 = parent2[i]
+        # Swapping the matched value
+        offspring1.representation[i], offspring1.representation[p1[aux2]] = aux2, aux1
+        offspring2.representation[i], offspring2.representation[p2[aux1]] = aux1, aux2
+        # Position bookkeeping
+        p1[aux1], p1[aux2] = p1[aux2], p1[aux1]
+        p2[aux1], p2[aux2] = p2[aux2], p2[aux1]
+
     return offspring1, offspring2
 
 # -------------------------------------------------------------------------------------------------
