@@ -37,14 +37,14 @@ class TravelSalesmanProblem( ProblemTemplate ):
         self._ycoords = decision_variables["Y"]
         self._distancematrix = pd.DataFrame(decision_variables).drop(["City_id", "City", "X", "Y"], axis=1)
         
-        tsp_encoding_rule["Size"] = len( self._cities )
-
+        encoding_rule["Size"] = len( self._cities )
+        self._encoding_rule = encoding_rule
 
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
         super().__init__(
             decision_variables = decision_variables, 
             constraints = constraints, 
-            encoding_rule = tsp_encoding_rule
+            encoding_rule = encoding_rule
         )
 
         # 1. Define the Name of the Problem
@@ -58,21 +58,21 @@ class TravelSalesmanProblem( ProblemTemplate ):
     def build_solution(self):
         """
         """
-        solution = []
-        for i in range(tsp_encoding_rule["Size"]):
-            solution.append(i)
+        encoding_data = self._encoding.encoding_data
+
+        solution_representation = []
+        for i in range(0, self._encoding.size):
+            solution_representation.append(i)
         random.shuffle(solution)
 
         solution.append(solution[0])
 
         solution = LinearSolution(
-            representation = solution,
-            encoding_rule = tsp_encoding_rule
+            representation = solution_representation,
+            encoding_rule = self._encoding_rule
         )
 
         return solution
-
-
 
 
     # Solution Admissibility Function - is_admissible()
@@ -82,6 +82,7 @@ class TravelSalesmanProblem( ProblemTemplate ):
         Solution length is always 90 so let's just return True.
         """
         return True
+
 
     # Evaluate_solution()
     #-------------------------------------------------------------------------------------------------------------

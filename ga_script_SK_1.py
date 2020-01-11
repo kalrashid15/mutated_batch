@@ -170,7 +170,6 @@ travel_salesman_instance = TravelSalesmanProblem(
     decision_variables = tsp_dv,
     constraints = None) 
 
-
 pip_problem_instance = PortfolioInvestmentProblem (
     decision_variables = [pip_dv, df_stocks],
     constraints = {"Max-Investment" : 100000, "Risk-Tolerance": 1, "Risk-free-rate": 1.56}
@@ -185,19 +184,19 @@ parent_selection = TournamentSelection()
 params = {
         # params
         "Population-Size"           : 20,
-        "Number-of-Generations"     : 100,
-        "Crossover-Probability"     : 0.8,
-        "Mutation-Probability"      : 0.8,
+        "Number-of-Generations"     : 50,
+        "Crossover-Probability"     : 0.9,
+        "Mutation-Probability"      : 0.9,
         # operators / approaches
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : cycle_crossover,
-        "Mutation-Aproach"          : swap_mutation,
+        "Crossover-Approach"        : pmx_crossover,
+        "Mutation-Aproach"          : single_point_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
-log_name = "baseline"
+log_name = "TSP_TS_PMX_SPM_1000gen_20pop"
 
 number_of_runs = 30
 
@@ -206,7 +205,7 @@ number_of_runs = 30
 for run in range(1,number_of_runs + 1):
     # Genetic Algorithm
     ga = GeneticAlgorithm( 
-        problem_instance = travel_salesman_instance,
+        problem_instance = pip_problem_instance,
         params =  params,
         run = run,
         log_name = log_name )
