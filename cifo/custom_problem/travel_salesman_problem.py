@@ -58,12 +58,19 @@ class TravelSalesmanProblem( ProblemTemplate ):
     def build_solution(self):
         """
         """
-        new_solution = []
+        solution = []
         for i in range(tsp_encoding_rule["Size"]):
-            new_solution.append(i)
-        random.shuffle(new_solution)
-            
-        return new_solution
+            solution.append(i)
+        random.shuffle(solution)
+
+        solution.append(solution[0])
+
+        solution = LinearSolution(
+            representation = solution,
+            encoding_rule = tsp_encoding_rule
+        )
+
+        return solution
 
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
@@ -79,16 +86,16 @@ class TravelSalesmanProblem( ProblemTemplate ):
     def evaluate_solution(self, solution, feedback = None):# << This method does not need to be extended, it already automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
         """
-        solution.append(solution[0])
         total_fit = 0
 
-        for i in range(len(solution)):
-            origin = solution[i-1]
-            destination = solution[i]
+        for i in range(len(solution.representation)):
+            origin = solution.representation[i-1]
+            destination = solution.representation[i]
             
             total_fit += self._distancematrix.loc[origin, destination]
         
-        return total_fit        
+        solution.fitness = total_fit
+        return solution        
 
 
 # -------------------------------------------------------------------------------------------------

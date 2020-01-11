@@ -201,7 +201,7 @@ number_of_runs = 30
 for run in range(1,number_of_runs + 1):
     # Genetic Algorithm
     ga = GeneticAlgorithm( 
-        problem_instance = knapsack_problem_instance,
+        problem_instance = travel_salesman_instance,
         params =  params,
         run = run,
         log_name = log_name )
