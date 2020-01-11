@@ -373,22 +373,18 @@ def single_point_mutation( problem, solution):
     encoding    = problem.encoding
 
     if encoding.encoding_type == EncodingDataType.choices :
-<<<<<<< Updated upstream
-        # try:
-=======
+        temp = deepcopy( solution.representation )
+        # temp = [x for i,x in enumerate(temp) if i!= solution.representation[ singlepoint ]]
+        # print("\n\n", temp, "\n\n")
+        temp.pop(solution.representation[ singlepoint ])
 
-        try:
->>>>>>> Stashed changes
-            temp = deepcopy( encoding.encoding_data )
-            temp.pop( solution.representation[ singlepoint ] )
-            gene = temp[0]
-            if len(temp) > 1 : gene = choices( temp )  
 
-            solution.representation[ singlepoint ] = gene
+        gene = temp[0]
+        if len(temp) > 1 : gene = choices( temp )  
 
-            return solution
-        # except:
-        #     print('(!) Error: singlepoint mutation encoding.data issues)' )     
+        solution.representation[ singlepoint ] = gene
+
+        return solution
 
     # return solution           
 
@@ -396,19 +392,20 @@ def single_point_mutation( problem, solution):
 # Swap mutation
 # -----------------------------------------------------------------------------------------------
 #TODO: Implement Swap mutation: Done by Rashid @21/12/2019
-def swap_mutation( problem, solution):
+
+def swap_mutation(problem, solution):
     first_point = randint(0, len(solution.representation) -1)
     second_point = first_point
 
     while(second_point == first_point):
         second_point = randint(0, len(solution.representation) -1)
-    
+
     gene_1 = solution.representation[first_point]
     gene_2 = solution.representation[second_point]
 
     solution.representation[first_point] = gene_2
     solution.representation[second_point] = gene_1
- 
+
     return solution
 
     #I am pretty sure we dont need to bring in encoding here.

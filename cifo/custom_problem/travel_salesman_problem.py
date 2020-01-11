@@ -37,6 +37,7 @@ class TravelSalesmanProblem( ProblemTemplate ):
         self._ycoords = decision_variables["Y"]
         self._distancematrix = pd.DataFrame(decision_variables).drop(["City_id", "City", "X", "Y"], axis=1)
         self._all_fitnesses = [] 
+        self._best_fitness = 999999999
 
         encoding_rule["Size"] = len( self._cities )
         self._encoding_rule = encoding_rule
@@ -98,11 +99,12 @@ class TravelSalesmanProblem( ProblemTemplate ):
             total_fit += self._distancematrix.loc[origin, destination]
         
         solution.fitness = total_fit
-        self._all_fitnesses.append(solution.fitness)
 
-        for i in self._all_fitnesses:
-            if solution.fitness < i:
-                self._best_fitness_solution = solution.representation
+        # self._all_fitnesses.append(solution.fitness)
+
+        # if solution.fitness < self._best_fitness:
+        #     self._best_fitness = solution.fitness
+        #     self._best_fitness_solution = solution.representation
 
         return solution        
 

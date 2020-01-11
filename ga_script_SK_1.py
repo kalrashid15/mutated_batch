@@ -183,45 +183,29 @@ parent_selection = TournamentSelection()
 
 params = {
         # params
-<<<<<<< Updated upstream
-        "Population-Size"           : 20,
-        "Number-of-Generations"     : 100,
-        "Crossover-Probability"     : 0.9,
-        "Mutation-Probability"      : 0.9,
-=======
         "Population-Size"           : 20, #20 max
-        "Number-of-Generations"     : 100, #1000 max
+        "Number-of-Generations"     : 2, #1000 max
         "Crossover-Probability"     : 0.9, #0.9 best
         "Mutation-Probability"      : 0.9, #0.9 best
->>>>>>> Stashed changes
         # operators / approaches
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-<<<<<<< Updated upstream
-        "Crossover-Approach"        : pmx_crossover,
+        "Crossover-Approach"        : singlepoint_crossover,
         "Mutation-Aproach"          : single_point_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
-log_name = "TSP_TS_PMX_SPM_1000gen_20pop"
-=======
-        "Crossover-Approach"        : singlepoint_crossover,
-        "Mutation-Aproach"          : swap_mutation,
-        "Replacement-Approach"      : elitism_replacement
-    }
+log_name = "PIP__"
 
-log_name = "PIP-"
->>>>>>> Stashed changes
-
-number_of_runs = 30 #change to 30
+number_of_runs = 2 #change to 30
 
 # Run the same configuration many times
 #--------------------------------------------------------------------------------------------------
 for run in range(1,number_of_runs + 1):
     # Genetic Algorithm
     ga = GeneticAlgorithm( 
-        problem_instance = pip_problem_instance,
+        problem_instance = travel_salesman_instance,
         params =  params,
         run = run,
         log_name = log_name )
