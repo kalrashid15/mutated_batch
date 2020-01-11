@@ -122,14 +122,17 @@ class RouletteWheelSelection:
             breakpoint
         """
         for solution in population.solutions :
-            """
+            
             if objective == ProblemObjective.Maximization:
                 stop_position += (solution.fitness / total_fitness)
-                stop_position += solution.fitness
+                #stop_position += solution.fitness
             elif objective == ProblemObjective.Minimization:
                 stop_position += 1 / solution.fitness / solution_fitness_min
             """
+            Temp fix below
+            
             stop_position += 1 / solution.fitness / solution_fitness_min
+            """
             #stop_position +=(1/solution.fitness)
             if stop_position > wheel_position :
                 break
@@ -236,9 +239,7 @@ class TournamentSelection:
 def singlepoint_crossover( problem, solution1, solution2):
     print(f"Problem: {problem}\nSolution1: {solution1}\nSolution2: {solution2}")
     singlepoint = randint(0, len(solution1.representation)-1)
-    #print(f" >> singlepoint: {singlepoint}")
-    #print(f'type of solution ', type(solution1))
-    # print(f" >> singlepoint: {singlepoint}")
+
 
     offspring1 = deepcopy(solution1) #solution1.clone()
     offspring2 = deepcopy(solution2) #.clone()
@@ -247,10 +248,6 @@ def singlepoint_crossover( problem, solution1, solution2):
         offspring1.representation[i] = solution2.representation[i]
         offspring2.representation[i] = solution1.representation[i]
 
-        #print(f'print offspring1', offspring1)
-        #print(f'print offspring2', offspring2)
-
-        #print(f'types:', type(offspring1))
 
     return offspring1, offspring2    
 
@@ -362,7 +359,7 @@ def pmx_crossover(problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Cycle Crossover: Natalia
+# TODO: implement Cycle Crossover: Rashid
 
 def cycle_crossover(problem, solution1, solution2):
     parent1 = deepcopy(solution1)
