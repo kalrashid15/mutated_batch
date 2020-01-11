@@ -44,7 +44,7 @@ class TravelSalesmanProblem( ProblemTemplate ):
         super().__init__(
             decision_variables = decision_variables, 
             constraints = constraints, 
-            encoding_rule = encoding_rule
+            encoding_rule = tsp_encoding_rule
         )
 
         # 1. Define the Name of the Problem
