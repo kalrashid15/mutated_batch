@@ -88,11 +88,11 @@ class RouletteWheelSelection:
         """
         select two different parents using roulette wheel
         """
-        index1 = self._select_index(population = population)
+        index1 = self._select_index(population, objective)
         index2 = index1
         
         while index2 == index1:
-            index2 = self._select_index( population = population )
+            index2 = self._select_index( population, objective )
 
         return population.get( index1 ), population.get( index2 )
 
@@ -114,13 +114,22 @@ class RouletteWheelSelection:
         # calculate the position which wheel should stop
         stop_position = 0
         index = 0
+        
+        """
+        if objective == ProblemObjective.Maximization:
+
+            print(objective)
+            breakpoint
+        """
         for solution in population.solutions :
+            """
             if objective == ProblemObjective.Maximization:
                 stop_position += (solution.fitness / total_fitness)
-                #stop_position += solution.fitness
+                stop_position += solution.fitness
             elif objective == ProblemObjective.Minimization:
                 stop_position += 1 / solution.fitness / solution_fitness_min
-
+            """
+            stop_position += 1 / solution.fitness / solution_fitness_min
             #stop_position +=(1/solution.fitness)
             if stop_position > wheel_position :
                 break
