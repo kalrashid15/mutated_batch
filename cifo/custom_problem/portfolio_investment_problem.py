@@ -49,7 +49,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         self._max_investment = 0 # "Max-Investment"
         self._risk_tolerance = 0 # "Max-width"
         self._df_stocks = pd.DataFrame() # a dataframe to store historical prices to generate Cov table.
-
+        self._optimum_stocks = 0
 
         if (len(decision_variables) != 2):
             print(f'we do not have all the variables')
@@ -76,6 +76,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         
         if len(decision_variables) == 2:
             self._df_stocks = decision_variables[1]
+            #self._cov_mat = self._df_stocks.cov()
 
         if "Risk-free-rate" in constraints:
             self._rf_rate = constraints["Risk-free-rate"]
@@ -87,17 +88,16 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         
         if "Risk-Tolerance" in constraints:
             self._risk_tolerance = constraints["Risk-Tolerance"]
+
+        if "Optimum_num" in constraints:
+            self._optimum_stocks = constraints["Optimum_num"]
+        else:
+            self._optimum_value = len(self._stocks)
         
-        #sanity check of the assignments
-        """
-        print(f'stocks: {self._stocks[100:210]}, stock names {self._stock_names[100:210]}, prices {self._stock_names[100:210]}')
-        print(f'risk free rates: {self._rf_rate}, limit {self._max_investment}, risk tolerate {self._risk_tolerance}')
-        print(f'dataframe for cov {self._df_stocks.head()}')
 
-        breakpoint
-        """
         encoding_rule["Size"] = len( self._stocks )
-
+        #print(encoding_rule["Size"])
+        encoding_rule["Data"] = list(range(1,5))
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
         super().__init__(
             decision_variables = decision_variables, 
@@ -117,14 +117,36 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
     #----------------------------------------------------------------------------------------------
     def build_solution(self):
         """
-        To bui
+        To build the solution
+        we pick 32 stocks from the list as par Fisher and laurie (1970)
         """
         solution_representation = []
-        encoding_data = self._encoding.encoding_data
         
-        for _ in range(0, self._encoding.size):
-            solution_representation.append(choice(encoding_data))
-            #print(solution_representation.append(choice(encoding_data)))
+        #for _ in range(0, total_stock_size):
+        #calculate portfolio investment
+        def cal_total_investment(porfolio):
+            total_investment = 0
+            for i in porfolio:
+                if i == 1:
+                    total_investment += float(self._prices[i])
+            return total_investment
+
+
+        solution_representation = [0]*self._encoding_rule['Size']
+        #len(solution_representation) sum(solution_representation) < 32) & 
+        investment_limit = 0
+        tolerance = 0.1 #limit before reaching the full investment
+        while True:
+            n = choice(self._encoding_rule['Data'])
+            solution_representation[randint(0,len(solution_representation)-1)] = n
+            solution_investment = cal_total_investment(solution_representation)
+            investment_limit += solution_investment
+            
+            if (investment_limit >= self._max_investment*(1-tolerance)):
+                break
+        #print('investment limit', investment_limit)
+        #solution_representation[1] = 15
+        #print((solution_representation))
         solution = LinearSolution(
             representation = solution_representation,
             encoding_rule = self._encoding_rule
@@ -153,41 +175,48 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
         """
         #calcuate cov_matrix
-        df_stocks = pd.read_excel(r'./data/sp_12_weeks.xlsx')
 
-        def cal_pfolio_risk(portfolio):
+        def cal_pfolio_risk(portfolio, weights):
             #find the list of stocks and their weights
 
-            count = Counter(portfolio).items()
-            percentages = {x: float(float(y) / len(portfolio) * 100.00) for x, y in count}
+            #count = Counter(portfolio).items()
+            #percentages = {x: float(float(y) / len(portfolio) * 100.00) for x, y in count}
+            #print(percentages)
+            #list_of_stocks = percentages.keys()
+            #weight_of_stocks = np.array([float(x) for x in list(percentages.values())])
+            list_of_stocks = portfolio
+            weight_of_stocks = np.array(weights)
             
-            list_of_stocks = percentages.keys()
-            weight_of_stocks = np.array([float(x) for x in list(percentages.values())])
-
-            cov_mat = df_stocks[list_of_stocks].cov()
+            cov_mat = self._df_stocks[list_of_stocks].cov()
             pfolio_risk = np.sqrt(np.dot(weight_of_stocks.T, np.dot(cov_mat, weight_of_stocks)))
+
 
             return pfolio_risk
         
         #defining a function to calcuate total investment of portfolio
-        def cal_total_investment(porfolio):
+        def cal_total_investment(porfolio, weights):
             total_investment = 0
+            j = 0 #j index
             for stock in porfolio:
                 i = self._stocks.index(stock)
-                total_investment += float(self._prices[i])
+                total_investment += (float(self._prices[i]) * weights[j])
+                j += 1
+            #print('check:  ',total_investment)
             return total_investment 
 
         #calculating total return
-        def cal_total_return(portfolio):
+        def cal_total_return(portfolio, weights):
             total_return = 0
+            j = 0 #j index
             for stock in portfolio:
                 i = self._stocks.index(stock)
-                total_return += float(self._exp_rets[i])
+                total_return += float(self._exp_rets[i] * weights[j])
+                j += 1
             return total_return
 
         
         #defining a function to calcuate total risk of a porfoilio
-        def cal_pfolio_sR(portfolio):
+        def cal_pfolio_sR(portfolio, weights):
             #Sharpe Ratio = (Rx – Rf) / StdDev Rx
             pfolio_sR = 0
 
@@ -198,14 +227,14 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             # pfolio_sR = float((pfolio_ret - rf_ret) / pfolio_std)
             
             #calcuating the nominitor
-            pfolio_exp_ret = cal_total_return(portfolio) -  self._rf_rate
+            pfolio_exp_ret = cal_total_return(portfolio, weights) -  self._rf_rate
 
             #calcuating the denominitor
-            pfolio_std_div = cal_pfolio_risk(portfolio)
+            pfolio_std_div = cal_pfolio_risk(portfolio, weights)
 
             if(pfolio_std_div != 0):
                 pfolio_sR = pfolio_exp_ret / pfolio_std_div
-
+            #print('sharp ratio ', pfolio_sR)
             return pfolio_sR
             
         #actual sharpe ratio calc.
@@ -216,17 +245,22 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         #admissibility test
         stocks = self._stocks
         current_pfolio = []
+        weights = []
 
-        for  i in range(0, len( stocks )):
-            if solution.representation[ i ] == 1:
+        for  i in range(0, len(solution.representation)):
+            #print(solution.representation)
+            if solution.representation[ i ] >= 1:
                 current_pfolio.append(stocks[ i ])
+                weights.append(solution.representation[ i ])
 
-        current_pfolio_investment = cal_total_investment(current_pfolio)
-        current_pfolio_sR = cal_pfolio_sR(current_pfolio) 
-        if (current_pfolio_investment <= self._max_investment) & (current_pfolio_sR >= self._rf_rate):
+
+
+        current_pfolio_investment = cal_total_investment(current_pfolio, weights)
+        current_pfolio_sR = cal_pfolio_sR(current_pfolio, weights)
+
+        #print(self._max_investment)
+        if (current_pfolio_investment <= self._max_investment) and (current_pfolio_sR >= self._rf_rate):
             result = True
-        else:
-            result = False
 
 
         return result 
@@ -238,16 +272,23 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         """
         highest fitness, based on highest return
         """
-        stocks = self._stocks
-        #print(f'prining stocks: ', *stocks)
+        #stocks = self._stocks
+        stocks_picked = deepcopy(solution.representation)
+        #print(f'prining stocks: ', *stocks_picked)
 
         fitness = 0
-        #print(f'len of stocks ', len(stocks))
-        #for  i in range(0, len( stocks )):
-            #if solution.representation[ i ] == 1:
-            #print(solution.representation[i])
-                #fitness += float(self._exp_rets[self._stocks.index(solution.representation[ i ])])#need to check this
+        money_spent = 0
+        #print(f'len of stocks ', len(self._stocks))
+        for i in range(0, len( self._stocks )):
+            if stocks_picked[ i ] == 1:
+                #find the index of that solution
+                #print(solution.representation[i])
+                fitness += float(self._exp_rets[ i ])#need to check this
+            elif stocks_picked[ i ] > 1:
+                fitness += i*float(self._exp_rets[ i ])
+                money_spent += i*float(self._prices[i])
         
+        #print('money spent ', money_spent)
         solution.fitness = fitness
 
         return solution      

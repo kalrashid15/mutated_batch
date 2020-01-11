@@ -232,7 +232,7 @@ class TournamentSelection:
 # Singlepoint crossover
 # -------------------------------------------------------------------------------------------------
 def singlepoint_crossover( problem, solution1, solution2):
-    print(f"Singlepoint Crossover\nProblem: {problem}\nSolution1: {solution1}\nSolution2: {solution2}")
+    #print(f"Singlepoint Crossover\nProblem: {problem}\nSolution1: {solution1}\nSolution2: {solution2}")
     singlepoint = randint(0, len(solution1.representation)-1)
 
 
@@ -243,7 +243,8 @@ def singlepoint_crossover( problem, solution1, solution2):
         offspring1.representation[i] = solution2.representation[i]
         offspring2.representation[i] = solution1.representation[i]
 
-
+    #offspring2.representation[4] = 7
+    #print(offspring1.representation, offspring2.representation)
     return offspring1, offspring2    
 
 # -------------------------------------------------------------------------------------------------
@@ -368,16 +369,18 @@ def cycle_crossover(problem, solution1, solution2):
 # -----------------------------------------------------------------------------------------------
 def single_point_mutation( problem, solution):
     singlepoint = randint( 0, len( solution.representation )-1 )
-    #print(f" >> singlepoint: {singlepoint}")
 
     encoding    = problem.encoding
 
     if encoding.encoding_type == EncodingDataType.choices :
+<<<<<<< Updated upstream
         # try:
+=======
+
+        try:
+>>>>>>> Stashed changes
             temp = deepcopy( encoding.encoding_data )
-
             temp.pop( solution.representation[ singlepoint ] )
-
             gene = temp[0]
             if len(temp) > 1 : gene = choices( temp )  
 

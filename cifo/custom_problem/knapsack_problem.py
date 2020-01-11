@@ -150,7 +150,7 @@ class KnapsackProblem( ProblemTemplate ):
 
         for _ in range(0, self._encoding.size):
             solution_representation.append( choice(encoding_data) )
-        
+        print(solution_representation)
         solution = LinearSolution(
             representation = solution_representation, 
             encoding_rule = self._encoding_rule
