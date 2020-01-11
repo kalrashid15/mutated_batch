@@ -32,13 +32,12 @@ class TravelSalesmanProblem( ProblemTemplate ):
         """
         # optimize the access to the decision variables
 
-        # TODO: extract attributes
         self._cities = decision_variables["City"]
         self._xcoords = decision_variables["X"]
         self._ycoords = decision_variables["Y"]
         self._distancematrix = pd.DataFrame(decision_variables).drop(["City_id", "City", "X", "Y"], axis=1)
         
-        encoding_rule["Size"] = len( self._cities )
+        tsp_encoding_rule["Size"] = len( self._cities )
 
 
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
@@ -60,7 +59,7 @@ class TravelSalesmanProblem( ProblemTemplate ):
         """
         """
         new_solution = []
-        for i in range(encoding_rule["Size"]):
+        for i in range(tsp_encoding_rule["Size"]):
             new_solution.append(i)
         random.shuffle(new_solution)
             
