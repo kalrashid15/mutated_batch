@@ -36,7 +36,8 @@ class TravelSalesmanProblem( ProblemTemplate ):
         self._xcoords = decision_variables["X"]
         self._ycoords = decision_variables["Y"]
         self._distancematrix = pd.DataFrame(decision_variables).drop(["City_id", "City", "X", "Y"], axis=1)
-        
+        self._all_fitnesses = [] 
+
         encoding_rule["Size"] = len( self._cities )
         self._encoding_rule = encoding_rule
 
@@ -58,14 +59,12 @@ class TravelSalesmanProblem( ProblemTemplate ):
     def build_solution(self):
         """
         """
-        encoding_data = self._encoding.encoding_data
-
         solution_representation = []
         for i in range(0, self._encoding.size):
             solution_representation.append(i)
-        random.shuffle(solution)
-
-        solution.append(solution[0])
+            
+        random.shuffle(solution_representation)
+        solution_representation.append(solution_representation[0])
 
         solution = LinearSolution(
             representation = solution_representation,
@@ -99,6 +98,12 @@ class TravelSalesmanProblem( ProblemTemplate ):
             total_fit += self._distancematrix.loc[origin, destination]
         
         solution.fitness = total_fit
+        self._all_fitnesses.append(solution.fitness)
+
+        for i in self._all_fitnesses:
+            if solution.fitness < i:
+                self._best_fitness_solution = solution.representation
+
         return solution        
 
 
