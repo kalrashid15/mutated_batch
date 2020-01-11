@@ -38,39 +38,64 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
         """
         # optimize the access to the decision variables
+        #declaring variables
+
         self._stocks = []
-
-        if "stock" in decision_variables:
-            self._stocks = decision_variables["stock"]
-
         self._stock_names = []
-        if "stock_name" in decision_variables:
-            self._stock_names = decision_variables["stock_name"]
-
         self._prices = []
-        if "price" in decision_variables:
-            self._prices = decision_variables["price"]
-        
         self._exp_rets = []
-        if "exp_ret" in decision_variables:
-            self._exp_rets = decision_variables["exp_ret"]
-
         self._stdivs = []
-        if "stdiv" in decision_variables:
-            self._stdivs = decision_variables["stock_name"]
+        self._rf_rate = 0
+        self._max_investment = 0 # "Max-Investment"
+        self._risk_tolerance = 0 # "Max-width"
+        self._df_stocks = pd.DataFrame() # a dataframe to store historical prices to generate Cov table.
 
-        self._rf_rate = []
+
+        if (len(decision_variables) != 2):
+            print(f'we do not have all the variables')
+
+
+        if "stock" in decision_variables[0]:
+            self._stocks = decision_variables[0]["stock"]
+
+        
+        if "stock_name" in decision_variables[0]:
+            self._stock_names = decision_variables[0]["stock_name"]
+
+        if "price" in decision_variables[0]:
+            self._prices = decision_variables[0]["price"]
+        
+        
+        if "exp_ret" in decision_variables[0]:
+            self._exp_rets = decision_variables[0]["exp_ret"]
+
+        
+        if "stdiv" in decision_variables[0]:
+            self._stdivs = decision_variables[0]["stock_name"]
+
+        
+        if len(decision_variables) == 2:
+            self._df_stocks = decision_variables[1]
+
         if "Risk-free-rate" in constraints:
             self._rf_rate = constraints["Risk-free-rate"]
 
-        self._max_investment = 0 # "Max-Weight"
+        
         if "Max-Investment" in constraints:
             self._max_investment = constraints["Max-Investment"]
         
-        self._risk_tolerance = 0 # "Max-Weight"
+        
         if "Risk-Tolerance" in constraints:
             self._risk_tolerance = constraints["Risk-Tolerance"]
+        
+        #sanity check of the assignments
+        """
+        print(f'stocks: {self._stocks[100:210]}, stock names {self._stock_names[100:210]}, prices {self._stock_names[100:210]}')
+        print(f'risk free rates: {self._rf_rate}, limit {self._max_investment}, risk tolerate {self._risk_tolerance}')
+        print(f'dataframe for cov {self._df_stocks.head()}')
 
+        breakpoint
+        """
         encoding_rule["Size"] = len( self._stocks )
 
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
@@ -86,6 +111,8 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         # 2. Define the Problem Objective
         self._objective = ProblemObjective.Maximization
 
+        #print(self._stocks)
+
     # Build Solution for PIP
     #----------------------------------------------------------------------------------------------
     def build_solution(self):
@@ -94,10 +121,10 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         """
         solution_representation = []
         encoding_data = self._encoding.encoding_data
-
+        
         for _ in range(0, self._encoding.size):
             solution_representation.append(choice(encoding_data))
-        
+            #print(solution_representation.append(choice(encoding_data)))
         solution = LinearSolution(
             representation = solution_representation,
             encoding_rule = self._encoding_rule
@@ -162,7 +189,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         #defining a function to calcuate total risk of a porfoilio
         def cal_pfolio_sR(portfolio):
             #Sharpe Ratio = (Rx – Rf) / StdDev Rx
-
+            pfolio_sR = 0
 
             #not efficient way of calcuating sharpe ratio
             # pfolio_ret = cal_total_return(porfolio)
@@ -176,7 +203,8 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             #calcuating the denominitor
             pfolio_std_div = cal_pfolio_risk(portfolio)
 
-            pfolio_sR = pfolio_exp_ret / pfolio_std_div
+            if(pfolio_std_div != 0):
+                pfolio_sR = pfolio_exp_ret / pfolio_std_div
 
             return pfolio_sR
             
@@ -195,7 +223,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
         current_pfolio_investment = cal_total_investment(current_pfolio)
         current_pfolio_sR = cal_pfolio_sR(current_pfolio) 
-        if current_pfolio_investment <= self._max_investment & current_pfolio_sR >= self._rf_rate:
+        if (current_pfolio_investment <= self._max_investment) & (current_pfolio_sR >= self._rf_rate):
             result = True
         else:
             result = False
@@ -211,12 +239,14 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         highest fitness, based on highest return
         """
         stocks = self._stocks
+        #print(f'prining stocks: ', *stocks)
 
         fitness = 0
-        
-        for  i in range(0, len( stocks )):
-            if solution.representation[ i ] == 1:
-                fitness += float(self._exp_rets[self._stocks.index(solution.representation[ i ])])#need to check this
+        #print(f'len of stocks ', len(stocks))
+        #for  i in range(0, len( stocks )):
+            #if solution.representation[ i ] == 1:
+            #print(solution.representation[i])
+                #fitness += float(self._exp_rets[self._stocks.index(solution.representation[ i ])])#need to check this
         
         solution.fitness = fitness
 

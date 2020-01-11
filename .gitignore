@@ -7,3 +7,5 @@ __pycache__/
 **/.DS_Store
 application/cache
 untitled1.ipynb
+log/
+crossover-tests.ipynb

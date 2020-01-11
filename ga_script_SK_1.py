@@ -42,10 +42,10 @@ df_PIP = pd.read_excel(r'./data/sp500_gen.xlsx')
 #print(df_PIP['symbol'])
 
 #converting pd to dict to maintain similarities with the project
-pip_dv = df_PIP.to_dict('list')
+
 #remaining the columns for better keys
 df_PIP.rename(columns={'symbol':'stock', 'name': 'stock_name', 'exp_return_3m': 'exp_ret', 'standard_deviation': 'stdiv'}, inplace=True)
-
+pip_dv = df_PIP.to_dict('list')
 
 #keys include: stock, stock_name, price, exp_ret, stdiv
 
@@ -149,6 +149,11 @@ df_TSP = pd.read_excel(r'./data/TSP_data.xlsx')
 df_TSP.rename({"Unnamed: 3": "City_id"}, axis=1, inplace=True)
 tsp_dv = df_TSP.to_dict('list')
 
+#also importing breif historical data for Covariance between stocks calculations
+df_stocks = pd.read_excel(r'./data/sp_12_weeks.xlsx')
+
+
+
 # df_TSP.head()
 
 
@@ -167,32 +172,32 @@ travel_salesman_instance = TravelSalesmanProblem(
 
 
 pip_problem_instance = PortfolioInvestmentProblem (
-    decision_variables = pip_dv,
+    decision_variables = [pip_dv, df_stocks],
     constraints = {"Max-Investment" : 100000, "Risk-Tolerance": 1, "Risk-free-rate": 1.56}
 )
 
 # Configuration
 #--------------------------------------------------------------------------------------------------
 # parent selection object
-#parent_selection = TournamentSelection()
-parent_selection = RouletteWheelSelection()
+parent_selection = TournamentSelection()
+#parent_selection = RouletteWheelSelection()
 
 params = {
         # params
-        "Population-Size"           : 30,
-        "Number-of-Generations"     : 10,
+        "Population-Size"           : 20,
+        "Number-of-Generations"     : 100,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : pmx_crossover,
+        "Crossover-Approach"        : cycle_crossover,
         "Mutation-Aproach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
-log_name = "basline"
+log_name = "baseline"
 
 number_of_runs = 30
 

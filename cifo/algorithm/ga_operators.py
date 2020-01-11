@@ -115,13 +115,7 @@ class RouletteWheelSelection:
         # calculate the position which wheel should stop
         stop_position = 0
         index = 0
-        
-        """
-        if objective == ProblemObjective.Maximization:
 
-            print(objective)
-            breakpoint
-        """
         for solution in population.solutions :
             
             if objective == ProblemObjective.Maximization:
@@ -255,7 +249,7 @@ def singlepoint_crossover( problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # Partially Mapped Crossover
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Partially Mapped Crossover: Hugo
+# TODO: implement Partially Mapped Crossover: Hugo and Pedro
 def pmx_crossover(problem, solution1, solution2):
     """
     """
@@ -304,11 +298,9 @@ def cycle_crossover(problem, solution1, solution2):
     parent1 = deepcopy(solution1)
     parent2 = deepcopy(solution2)
     
-    print(parent1)
-    print(parent2)
     
     chrom_length = len(parent1.representation)
-    print(chrom_length)
+    #print(chrom_length)
     
     offspring1 = deepcopy(parent1)
     offspring2 = deepcopy(parent2)
@@ -335,7 +327,8 @@ def cycle_crossover(problem, solution1, solution2):
                 while True:
                     offspring1.representation[pos] = parent1.representation[pos]
                     count += 1
-                    pos = parent2.representation.index(parent1.representation[pos])
+                    if (parent1.representation[pos] in parent2.representation):
+                        pos = parent2.representation.index(parent1.representation[pos])
                     if p1_copy.representation[pos] == -1:
                         swap = False
                         break

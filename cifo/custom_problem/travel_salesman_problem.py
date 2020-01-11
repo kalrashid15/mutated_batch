@@ -72,6 +72,9 @@ class TravelSalesmanProblem( ProblemTemplate ):
 
         return solution
 
+
+
+
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
     def is_admissible( self, solution ): #<< use this signature in the sub classes, the meta-heuristic 
