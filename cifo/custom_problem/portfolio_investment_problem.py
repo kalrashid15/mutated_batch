@@ -10,6 +10,11 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
+
+import openpyxl
+
+
+
 pip_encoding_rule = {
     "Size"         : -1, # It must be defined by the size of DV (Number of products)
     "Is ordered"   : False,
@@ -50,6 +55,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         self._risk_tolerance = 0 # "Max-width"
         self._df_stocks = pd.DataFrame() # a dataframe to store historical prices to generate Cov table.
         self._optimum_stocks = 0
+        self._best_fit = 0
 
         if (len(decision_variables) != 2):
             print(f'we do not have all the variables')
@@ -133,7 +139,6 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
 
         solution_representation = [0]*self._encoding_rule['Size']
-        #len(solution_representation) sum(solution_representation) < 32) & 
         investment_limit = 0
         tolerance = 0.1 #limit before reaching the full investment
         while True:
@@ -144,9 +149,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             
             if (investment_limit >= self._max_investment*(1-tolerance)):
                 break
-        #print('investment limit', investment_limit)
-        #solution_representation[1] = 15
-        #print((solution_representation))
+
         solution = LinearSolution(
             representation = solution_representation,
             encoding_rule = self._encoding_rule
@@ -177,13 +180,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         #calcuate cov_matrix
 
         def cal_pfolio_risk(portfolio, weights):
-            #find the list of stocks and their weights
 
-            #count = Counter(portfolio).items()
-            #percentages = {x: float(float(y) / len(portfolio) * 100.00) for x, y in count}
-            #print(percentages)
-            #list_of_stocks = percentages.keys()
-            #weight_of_stocks = np.array([float(x) for x in list(percentages.values())])
             list_of_stocks = portfolio
             weight_of_stocks = np.array(weights)
             
@@ -220,11 +217,6 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             #Sharpe Ratio = (Rx – Rf) / StdDev Rx
             pfolio_sR = 0
 
-            #not efficient way of calcuating sharpe ratio
-            # pfolio_ret = cal_total_return(porfolio)
-            # rf_ret = self._rf_rate
-            # pfolio_std = cal_total_std(porfolio)
-            # pfolio_sR = float((pfolio_ret - rf_ret) / pfolio_std)
             
             #calcuating the nominitor
             pfolio_exp_ret = cal_total_return(portfolio, weights) -  self._rf_rate
@@ -257,10 +249,31 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
         current_pfolio_investment = cal_total_investment(current_pfolio, weights)
         current_pfolio_sR = cal_pfolio_sR(current_pfolio, weights)
-
-        #print(self._max_investment)
+        print(f'porfolio Investment: {current_pfolio_investment}, and Sharp Ratio {current_pfolio_sR}')
         if (current_pfolio_investment <= self._max_investment) and (current_pfolio_sR >= self._rf_rate):
             result = True
+        else:
+            result = False
+        
+        """
+            wb = openpyxl.Workbook()
+            sheet = wb.active
+            sheet.title = 'stocks_picked'
+
+            c1 = sheet.cell(row = 1, column = 1)
+            c1.value = current_pfolio_investment
+            c1 = sheet.cell(row = 2, column = 2)
+            c1.value = 'test'
+
+            for  i in range(0, len(solution.representation)):
+                c1 = sheet.cell(row = 2, column = i+2)
+                c1.value = solution.representation[i]
+            wb.save("stocks.xlsx")
+            """
+
+
+
+           
 
 
         return result 
@@ -277,20 +290,25 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         #print(f'prining stocks: ', *stocks_picked)
 
         fitness = 0
-        money_spent = 0
-        #print(f'len of stocks ', len(self._stocks))
-        for i in range(0, len( self._stocks )):
-            if stocks_picked[ i ] == 1:
-                #find the index of that solution
-                #print(solution.representation[i])
-                fitness += float(self._exp_rets[ i ])#need to check this
-            elif stocks_picked[ i ] > 1:
-                fitness += i*float(self._exp_rets[ i ])
-                money_spent += i*float(self._prices[i])
-        
+
+        for i in range(0, len( stocks_picked )):
+            if stocks_picked[ i ] >= 1:
+               fitness += stocks_picked[ i ]*float(self._exp_rets[ i ])#need to check this
+
         #print('money spent ', money_spent)
         solution.fitness = fitness
 
+
+        """
+        if fitness > 700000:
+            dict_toWrite = {'fitness': solution.fitness,
+                            'cities': solution.representation}
+            f = open('stoks.txt', "w+")
+            
+            f.write('stocks: ' + repr(dict_toWrite) + '\n')
+            f.close()
+
+        """
         return solution      
 
 

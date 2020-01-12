@@ -25,7 +25,8 @@ from cifo.algorithm.ga_operators import (
     singlepoint_crossover,
     single_point_mutation,
     elitism_replacement, standard_replacement,
-    pmx_crossover, swap_mutation, cycle_crossover
+    pmx_crossover, swap_mutation, cycle_crossover,
+    inverse_mutation, scramble_mutation
 )    
 from cifo.util.terminal import Terminal, FontColor
 from cifo.util.observer import GeneticAlgorithmObserver
@@ -37,17 +38,8 @@ from random import randint
 #read the data files
 import pandas as pd
 
-#read PIP datafiles into pandas df
-df_PIP = pd.read_excel(r'./data/sp500_gen.xlsx')
-#print(df_PIP['symbol'])
 
-#converting pd to dict to maintain similarities with the project
 
-#remaining the columns for better keys
-df_PIP.rename(columns={'symbol':'stock', 'name': 'stock_name', 'exp_return_3m': 'exp_ret', 'standard_deviation': 'stdiv'}, inplace=True)
-pip_dv = df_PIP.to_dict('list')
-
-#keys include: stock, stock_name, price, exp_ret, stdiv
 
 
 #performance
@@ -149,6 +141,14 @@ df_TSP = pd.read_excel(r'./data/TSP_data.xlsx')
 df_TSP.rename({"Unnamed: 3": "City_id"}, axis=1, inplace=True)
 tsp_dv = df_TSP.to_dict('list')
 
+
+#read PIP datafiles into pandas df
+df_PIP = pd.read_excel(r'./data/sp500_gen.xlsx')
+#remaining the columns for better keys
+df_PIP.rename(columns={'symbol':'stock', 'name': 'stock_name', 'exp_return_3m': 'exp_ret', 'standard_deviation': 'stdiv'}, inplace=True)
+#convering it to a dict
+pip_dv = df_PIP.to_dict('list')
+
 #also importing breif historical data for Covariance between stocks calculations
 df_stocks = pd.read_excel(r'./data/sp_12_weeks.xlsx')
 
@@ -183,38 +183,22 @@ parent_selection = TournamentSelection()
 
 params = {
         # params
-<<<<<<< Updated upstream
-        "Population-Size"           : 20,
-        "Number-of-Generations"     : 100,
-        "Crossover-Probability"     : 0.9,
-        "Mutation-Probability"      : 0.9,
-=======
-        "Population-Size"           : 20, #20 max
-        "Number-of-Generations"     : 100, #1000 max
+        "Population-Size"           : 5, #20 max
+        "Number-of-Generations"     : 10, #1000 max
         "Crossover-Probability"     : 0.9, #0.9 best
         "Mutation-Probability"      : 0.9, #0.9 best
->>>>>>> Stashed changes
         # operators / approaches
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-<<<<<<< Updated upstream
-        "Crossover-Approach"        : pmx_crossover,
-        "Mutation-Aproach"          : single_point_mutation,
-        "Replacement-Approach"      : elitism_replacement
-    }
-
-log_name = "TSP_TS_PMX_SPM_1000gen_20pop"
-=======
         "Crossover-Approach"        : singlepoint_crossover,
         "Mutation-Aproach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
-log_name = "PIP-"
->>>>>>> Stashed changes
+log_name = "PIP-test"
 
-number_of_runs = 30 #change to 30
+number_of_runs = 3 #change to 30
 
 # Run the same configuration many times
 #--------------------------------------------------------------------------------------------------
@@ -265,6 +249,7 @@ for log_name in log_files:
 #fitness_sum = [sum(x) for x in zip(*fitness_runs)]   
 
 df = pd.DataFrame(list(zip(*fitness_runs)), columns = columns_name)
+
 
 fitness_sd   = list( df.std( axis = 1 ) )
 fitness_mean = list( df.mean( axis = 1 ) )

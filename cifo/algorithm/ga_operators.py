@@ -373,12 +373,7 @@ def single_point_mutation( problem, solution):
     encoding    = problem.encoding
 
     if encoding.encoding_type == EncodingDataType.choices :
-<<<<<<< Updated upstream
         # try:
-=======
-
-        try:
->>>>>>> Stashed changes
             temp = deepcopy( encoding.encoding_data )
             temp.pop( solution.representation[ singlepoint ] )
             gene = temp[0]
@@ -414,6 +409,60 @@ def swap_mutation( problem, solution):
     #I am pretty sure we dont need to bring in encoding here.
     #But if we do... I will take a look at it later.
     
+
+
+# -------------------------------------------------------------------------------------------------
+# Scramble mutation
+# -----------------------------------------------------------------------------------------------
+#TODO: Implement Swap mutation: Done by Rashid @11/01/2020
+def scramble_mutation( problem, solution):
+    first_point = randint(0, len(solution.representation) -1)
+    second_point = first_point + randint(0, len(solution.representation) -1)
+
+    chromosome = solution.representation
+
+    #selecting set of genes for scrumbling
+    genes = chromosome[first_point:second_point]
+
+    #shuffling the genes
+    random.shuffle(genes)
+
+    #assigning the shuffled genes back to the chromosome
+    chromosome[first_point:second_point] = genes
+
+    solution.representation = chromosome
+
+    return solution
+
+
+# -------------------------------------------------------------------------------------------------
+# Inverse mutation
+# -----------------------------------------------------------------------------------------------
+
+def inverse_mutation( problem, solution):
+    first_point = randint(0, len(solution.representation) -1)
+    second_point = first_point + randint(0, len(solution.representation) -1)
+
+    chromosome = solution.representation
+
+    #selecting set of genes for scrumbling
+    genes = chromosome[first_point:second_point]
+
+    #inversing the genes
+    genes.reverse()
+
+    #assigning the inverted genes back to the chromosome
+    chromosome[first_point:second_point] = genes
+
+    solution.representation = chromosome
+
+    return solution
+
+
+
+
+
+
 
 ###################################################################################################
 # REPLACEMENT APPROACHES
