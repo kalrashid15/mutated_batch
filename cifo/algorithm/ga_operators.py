@@ -373,19 +373,11 @@ def single_point_mutation( problem, solution):
     encoding    = problem.encoding
 
     if encoding.encoding_type == EncodingDataType.choices :
-<<<<<<< HEAD
-        # try:
-            temp = deepcopy( encoding.encoding_data )
-            temp.pop( solution.representation[ singlepoint ] )
-            gene = temp[0]
-            if len(temp) > 1 : gene = choices( temp )  
-=======
         temp = deepcopy( solution.representation )
         # temp = [x for i,x in enumerate(temp) if i!= solution.representation[ singlepoint ]]
         # print("\n\n", temp, "\n\n")
         temp.pop(solution.representation[ singlepoint ])
 
->>>>>>> 517df66ac389f4eb27b81fa5ab24f9604e90fdd3
 
         gene = temp[0]
         if len(temp) > 1 : gene = choices( temp )  
