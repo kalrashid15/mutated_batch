@@ -107,7 +107,9 @@ class RouletteWheelSelection:
         solution_fitness_min = 0
         for solution in population.solutions:
             total_fitness += solution.fitness
-            solution_fitness_min += 1/solution.fitness
+            if solution.fitness > 0:
+
+                solution_fitness_min += 1/solution.fitness
 
         # spin the wheel
         wheel_position = uniform( 0, 1 )
@@ -149,11 +151,11 @@ class RankSelection:
         # Step 2: Create a rank list [0, 1, 1, 2, 2, 2, ...]
         rank_list = []
 
-        for index in range(0, len(population)):
+        for index in range(0, len(population.solutions)):
             for _ in range(0, index + 1):
                 rank_list.append( index )
 
-        print(f" >> rank_list: {rank_list}")       
+        #print(f" >> rank_list: {rank_list}")       
 
         # Step 3: Select solution index
         index1 = randint(0, len( rank_list )-1)
@@ -168,16 +170,16 @@ class RankSelection:
     def _sort( self, population, objective ):
 
         if objective == ProblemObjective.Maximization:
-            for i in range (0, len( population )):
-                for j in range (i, len (population )):
+            for i in range (0, len( population.solutions )):
+                for j in range (i, len (population.solutions )):
                     if population.solutions[ i ].fitness > population.solutions[ j ].fitness:
                         swap = population.solutions[ j ]
                         population.solutions[ j ] = population.solutions[ i ]
                         population.solutions[ i ] = swap
                         
         else:    
-            for i in range (0, len( population )):
-                for j in range (i, len (population )):
+            for i in range (0, len( population.solutions )):
+                for j in range (i, len (population.solutions )):
                     if population.solutions[ i ].fitness < population.solutions[ j ].fitness:
                         swap = population.solutions[ j ]
                         population.solutions[ j ] = population.solutions[ i ]
@@ -254,6 +256,7 @@ def singlepoint_crossover( problem, solution1, solution2):
 def pmx_crossover(problem, solution1, solution2):
     """
     """
+    #print('chopped!!!!')
     parent1 = solution1.representation
     parent2 = solution2.representation
     

@@ -178,34 +178,35 @@ pip_problem_instance = PortfolioInvestmentProblem (
 # Configuration
 #--------------------------------------------------------------------------------------------------
 # parent selection object
-parent_selection = TournamentSelection()
+#parent_selection = TournamentSelection()
 #parent_selection = RouletteWheelSelection()
+parent_selection = RankSelection()
 
 params = {
         # params
         "Population-Size"           : 20, #20 max
-        "Number-of-Generations"     : 2, #1000 max
+        "Number-of-Generations"     : 1000, #1000 max
         "Crossover-Probability"     : 0.9, #0.9 best
         "Mutation-Probability"      : 0.9, #0.9 best
         # operators / approaches
         "Initialization-Approach"   : initialize_randomly,
         "Selection-Approach"        : parent_selection.select,
-        "Tournament-Size"           : 5,
-        "Crossover-Approach"        : singlepoint_crossover,
-        "Mutation-Aproach"          : single_point_mutation,
+        "Tournament-Size"           : 15,
+        "Crossover-Approach"        : pmx_crossover,
+        "Mutation-Aproach"          : inverse_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
-log_name = "PIP__"
+log_name = "PIP_PMX-0.9_Inv-0.Rank-15_p-20_I-1000"
 
-number_of_runs = 2 #change to 30
+number_of_runs = 20 #change to 30
 
 # Run the same configuration many times
 #--------------------------------------------------------------------------------------------------
 for run in range(1,number_of_runs + 1):
     # Genetic Algorithm
     ga = GeneticAlgorithm( 
-        problem_instance = travel_salesman_instance,
+        problem_instance = pip_problem_instance,
         params =  params,
         run = run,
         log_name = log_name )

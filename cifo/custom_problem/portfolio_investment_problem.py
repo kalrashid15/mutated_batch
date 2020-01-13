@@ -12,6 +12,7 @@ import pandas as pd
 
 
 import openpyxl
+from itertools import takewhile, count
 
 
 
@@ -103,7 +104,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
         encoding_rule["Size"] = len( self._stocks )
         #print(encoding_rule["Size"])
-        encoding_rule["Data"] = list(range(1,5))
+        encoding_rule["Data"] = list(range(0,10))
         # Call the Parent-class constructor to store these values and to execute  any other logic to be implemented by the constructor of the super-class
         super().__init__(
             decision_variables = decision_variables, 
@@ -128,32 +129,41 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         """
         solution_representation = []
         
-        #for _ in range(0, total_stock_size):
         #calculate portfolio investment
-        def cal_total_investment(porfolio):
+        def cal_total_investment(portfolio):
             total_investment = 0
-            for i in porfolio:
-                if i == 1:
-                    total_investment += float(self._prices[i])
+            for i in range (0, len(portfolio)):
+                if portfolio[i] >= 1:
+                    #print(i, 'printing i')
+                    total_investment += float(self._prices[i])*portfolio[i]
             return total_investment
 
 
         solution_representation = [0]*self._encoding_rule['Size']
-        investment_limit = 0
-        tolerance = 0.1 #limit before reaching the full investment
-        while True:
+        solution_investment = 0
+        tolerance = 0.20 #limit before reaching the full investment
+        stock_counter = self._optimum_stocks
+
+        for i in takewhile(lambda i:i<stock_counter and solution_investment<self._max_investment*(1-tolerance), count()):
             n = choice(self._encoding_rule['Data'])
             solution_representation[randint(0,len(solution_representation)-1)] = n
-            solution_investment = cal_total_investment(solution_representation)
-            investment_limit += solution_investment
-            
-            if (investment_limit >= self._max_investment*(1-tolerance)):
-                break
+            solution_investment += cal_total_investment(solution_representation)
+            i+=1
 
+        """
+        while True: #((investment_limit <= self._max_investment*(1-tolerance)) ):#and (sum(solution_representation) < self._optimum_stocks)
+            n = choice(self._encoding_rule['Data'])
+            solution_representation[randint(0,len(solution_representation)-1)] = n
+            solution_investment = cal_total_investment(solution_representation)            
+            if (solution_investment >= self._max_investment*(1-tolerance)):
+                break
+        #print('investment limit :',investment_limit)
+        """
         solution = LinearSolution(
             representation = solution_representation,
             encoding_rule = self._encoding_rule
         )
+        #print(f'Build Solution: total stocks picked in {sum(solution.representation)}, at cost: {solution_investment}')
 
         return solution
     # Solution Admissibility Function - is_admissible()
@@ -181,9 +191,15 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
         def cal_pfolio_risk(portfolio, weights):
 
-            list_of_stocks = portfolio
-            weight_of_stocks = np.array(weights)
+            list_of_stocks = []
+            weight_of_stocks = []
+            for i in range(0, len(portfolio)):
+                if portfolio[i] >= 1:
+                    #print(f'printing stocks {stock}')
+                    list_of_stocks.append( self._stocks[i])
+                    weight_of_stocks.append(weights[i])
             
+            weight_of_stocks = np.array(weight_of_stocks)
             cov_mat = self._df_stocks[list_of_stocks].cov()
             pfolio_risk = np.sqrt(np.dot(weight_of_stocks.T, np.dot(cov_mat, weight_of_stocks)))
 
@@ -191,24 +207,23 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             return pfolio_risk
         
         #defining a function to calcuate total investment of portfolio
-        def cal_total_investment(porfolio, weights):
+        def cal_total_investment(portfolio, weights):
+            #print(f'calculating weights at investment calc{sum(portfolio)}')
             total_investment = 0
-            j = 0 #j index
-            for stock in porfolio:
-                i = self._stocks.index(stock)
-                total_investment += (float(self._prices[i]) * weights[j])
-                j += 1
-            #print('check:  ',total_investment)
+            for i in range(0, len( portfolio )):
+                if portfolio[ i ] >= 1:
+                    #print(f'printing stock details {self._stocks[i]}, price: {self._prices[i]}, {self._exp_rets[i]} and weight {weights[i]}')
+
+                    #print(f'printing cal_total_invest_: {i}, {self._prices[i]}, and {weights[i]}')
+                    total_investment += (float(self._prices[i]) * weights[i])
             return total_investment 
 
         #calculating total return
         def cal_total_return(portfolio, weights):
             total_return = 0
-            j = 0 #j index
-            for stock in portfolio:
-                i = self._stocks.index(stock)
-                total_return += float(self._exp_rets[i] * weights[j])
-                j += 1
+            for i in range(0, len( portfolio )):
+                if portfolio[ i ] >= 1:
+                    total_return += float(self._exp_rets[i] * weights[i])
             return total_return
 
         
@@ -226,7 +241,9 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
             if(pfolio_std_div != 0):
                 pfolio_sR = pfolio_exp_ret / pfolio_std_div
+            
             #print('sharp ratio ', pfolio_sR)
+
             return pfolio_sR
             
         #actual sharpe ratio calc.
@@ -234,46 +251,34 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         #then pfolio_risk = np.sqrt(np.dot(weight_of_stocks.T, np.dot(cov_mat, weight_of_stocks)))                          
 
         
-        #admissibility test
-        stocks = self._stocks
-        current_pfolio = []
-        weights = []
 
+
+
+        #admissibility test
+        current_pfolio = solution.representation
+        weights = [0] * (len(solution.representation))
+        
         for  i in range(0, len(solution.representation)):
             #print(solution.representation)
             if solution.representation[ i ] >= 1:
-                current_pfolio.append(stocks[ i ])
-                weights.append(solution.representation[ i ])
+                #current_pfolio[i] = stocks[ i ]
+                weights[i]= solution.representation[ i ]
+                #/sum(current_pfolio)prin
+        #print(current_pfolio)
 
-
-
+        #print(f'weigth calculated at admissibilty {sum(weights)}')
+        #print(current_pfolio,'current pfolio')
         current_pfolio_investment = cal_total_investment(current_pfolio, weights)
         current_pfolio_sR = cal_pfolio_sR(current_pfolio, weights)
-        print(f'porfolio Investment: {current_pfolio_investment}, and Sharp Ratio {current_pfolio_sR}')
-        if (current_pfolio_investment <= self._max_investment) and (current_pfolio_sR >= self._rf_rate):
+        
+        if (current_pfolio_investment <= self._max_investment) and (current_pfolio_sR >= self._risk_tolerance):
             result = True
+            #print(f'Accepted!  porfolio Investment: {current_pfolio_investment}, and Sharp Ratio {current_pfolio_sR}')
         else:
+            #print(f'rejected: {current_pfolio_investment}, and Sharp Ratio {current_pfolio_sR}')
             result = False
         
-        """
-            wb = openpyxl.Workbook()
-            sheet = wb.active
-            sheet.title = 'stocks_picked'
 
-            c1 = sheet.cell(row = 1, column = 1)
-            c1.value = current_pfolio_investment
-            c1 = sheet.cell(row = 2, column = 2)
-            c1.value = 'test'
-
-            for  i in range(0, len(solution.representation)):
-                c1 = sheet.cell(row = 2, column = i+2)
-                c1.value = solution.representation[i]
-            wb.save("stocks.xlsx")
-            """
-
-
-
-           
 
 
         return result 
@@ -287,28 +292,33 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         """
         #stocks = self._stocks
         stocks_picked = deepcopy(solution.representation)
-        #print(f'prining stocks: ', *stocks_picked)
 
+        """
+        portfolio return with i stocks, Rp = sum (W_i x R_i)
+
+        """
+
+        total_weight = sum(stocks_picked)
         fitness = 0
 
         for i in range(0, len( stocks_picked )):
             if stocks_picked[ i ] >= 1:
-               fitness += stocks_picked[ i ]*float(self._exp_rets[ i ])#need to check this
+                fitness += round((stocks_picked[ i ]/ total_weight)*(self._exp_rets[ i ])/100,2)#need to check this
+                #fitness /= 100
+                #fitness = round(fitness/100, 2)
 
-        #print('money spent ', money_spent)
         solution.fitness = fitness
+        if solution.fitness > self._best_fit:
+            self._best_fit = solution.fitness
 
-
-        """
-        if fitness > 700000:
             dict_toWrite = {'fitness': solution.fitness,
-                            'cities': solution.representation}
-            f = open('stoks.txt', "w+")
+                            'stocks': solution.representation}
+            f = open('stocks-PIP_PMX-09_Inv-09_RankS-15_p-20_I-1000.txt', "w+")
             
             f.write('stocks: ' + repr(dict_toWrite) + '\n')
             f.close()
 
-        """
+        
         return solution      
 
 
