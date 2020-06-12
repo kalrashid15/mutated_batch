@@ -150,15 +150,6 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
             solution_investment += cal_total_investment(solution_representation)
             i+=1
 
-        """
-        while True: #((investment_limit <= self._max_investment*(1-tolerance)) ):#and (sum(solution_representation) < self._optimum_stocks)
-            n = choice(self._encoding_rule['Data'])
-            solution_representation[randint(0,len(solution_representation)-1)] = n
-            solution_investment = cal_total_investment(solution_representation)            
-            if (solution_investment >= self._max_investment*(1-tolerance)):
-                break
-        #print('investment limit :',investment_limit)
-        """
         solution = LinearSolution(
             representation = solution_representation,
             encoding_rule = self._encoding_rule
@@ -327,8 +318,6 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 #            (Hill Climbing and Simulated Annealing)
 # -------------------------------------------------------------------------------------------------
 def pip_bitflip_get_neighbors( solution, problem, neighborhood_size = 0 ):
-    pass
-    """
     neighbors = []
 
     # Generate all neighbors considering a bit flip
@@ -355,4 +344,3 @@ def pip_bitflip_get_neighbors( solution, problem, neighborhood_size = 0 ):
             indexes.remove( selected_index )
 
         return subset_neighbors  
-    """
