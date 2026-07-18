@@ -78,7 +78,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
         
         if "stdiv" in decision_variables[0]:
-            self._stdivs = decision_variables[0]["stock_name"]
+            self._stdivs = decision_variables[0]["stdiv"]
 
         
         if len(decision_variables) == 2:
@@ -99,9 +99,10 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         if "Optimum_num" in constraints:
             self._optimum_stocks = constraints["Optimum_num"]
         else:
-            self._optimum_value = len(self._stocks)
+            self._optimum_stocks = len(self._stocks)
         
 
+        encoding_rule = deepcopy(encoding_rule)
         encoding_rule["Size"] = len( self._stocks )
         #print(encoding_rule["Size"])
         encoding_rule["Data"] = list(range(0,10))
@@ -147,7 +148,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         for i in takewhile(lambda i:i<stock_counter and solution_investment<self._max_investment*(1-tolerance), count()):
             n = choice(self._encoding_rule['Data'])
             solution_representation[randint(0,len(solution_representation)-1)] = n
-            solution_investment += cal_total_investment(solution_representation)
+            solution_investment = cal_total_investment(solution_representation)
             i+=1
 
         solution = LinearSolution(
@@ -292,6 +293,10 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         total_weight = sum(stocks_picked)
         fitness = 0
 
+        if total_weight == 0:
+            solution.fitness = fitness
+            return solution
+
         for i in range(0, len( stocks_picked )):
             if stocks_picked[ i ] >= 1:
                 fitness += round((stocks_picked[ i ]/ total_weight)*(self._exp_rets[ i ])/100,2)#need to check this
@@ -304,10 +309,8 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
             dict_toWrite = {'fitness': solution.fitness,
                             'stocks': solution.representation}
-            f = open('stocks-PIP_PMX-09_Inv-09_RankS-15_p-20_I-1000.txt', "w+")
-            
-            f.write('stocks: ' + repr(dict_toWrite) + '\n')
-            f.close()
+            with open('stocks-PIP_PMX-09_Inv-09_RankS-15_p-20_I-1000.txt', "w+") as f:
+                f.write('stocks: ' + repr(dict_toWrite) + '\n')
 
         
         return solution      
